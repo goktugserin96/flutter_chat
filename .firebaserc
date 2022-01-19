@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "flutter-android-application": "flutter-android-application",
+    "default": "flutter-android-application"
+  },
+  "targets": {}
+}
