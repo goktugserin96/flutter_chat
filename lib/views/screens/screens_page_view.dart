@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_android_app/views/chat_rooms/charomm_kayit.dart';
+import 'package:flutter_android_app/views/chat_rooms/chatroom_view.dart';
 import 'package:flutter_android_app/views/users/online_users.dart';
 
 class MyHomePage extends StatelessWidget {
@@ -14,9 +14,7 @@ class MyHomePage extends StatelessWidget {
       body: PageView(
         controller: controller,
         children: [
-          chatroomPage(
-              //    name: name,
-              ),
+          chatroomPage(),
           OnlineUsers(),
         ],
       ),

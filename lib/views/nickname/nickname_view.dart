@@ -1,6 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_android_app/models/users.dart';
-import 'package:flutter_android_app/util/chatroom.dart';
 import 'package:flutter_android_app/views/screens/screens_page_view.dart';
 import 'package:flutter_android_app/views/users/users_view_model.dart';
 import 'package:provider/provider.dart';
@@ -63,7 +62,6 @@ class NickName extends StatefulWidget {
 }
 
 class _NickNameState extends State<NickName> {
-  ChatRoomType selectedRoom = ChatRoomType.room1;
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -92,23 +90,8 @@ class _NickNameState extends State<NickName> {
 //                       .addNewChatroomUsers(chatRoomsName: name);
 //                 }).toList();
 
-                ///user database için
-                Provider.of<UserViewModel>(context, listen: false) //database
-                    .addNewUser(users: widget._nameController.text);
-
-                ///userlist boş başlamasın diye provider add listesi için
                 Provider.of<UserViewModel>(context, listen: false) // list
-                    .addNewUserProvider(Users(
-                        users: widget._nameController.text,
-                        id: DateTime.now().toIso8601String()));
-
-                ///chat boş başlamasın diye provider add listesi için
-                // Provider.of<ChatViewModel>(context, listen: false) // list
-                //     .addNewchatInfoProvider(ChatInfo(
-                //         id: DateTime.now().toIso8601String(),
-                //         user: _nameController.text,
-                //         message: "welcome",
-                //         time: Calculator.dateTimeToTimeStamp(DateTime.now())));
+                    .addNewUser(users: widget._nameController.text);
 
                 Navigator.push(
                     context,

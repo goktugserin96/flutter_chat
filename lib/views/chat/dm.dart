@@ -11,11 +11,11 @@ import 'package:provider/provider.dart';
 
 import 'chat_view_model.dart';
 
-class ChatPage extends StatefulWidget {
+class Dm extends StatefulWidget {
   final ChatRooms chatRooms;
   final Users user;
 
-  const ChatPage({
+  const Dm({
     Key? key,
     required this.chatRooms,
     required this.user,
@@ -23,10 +23,10 @@ class ChatPage extends StatefulWidget {
     // required this.online
   }) : super(key: key);
   @override
-  State<ChatPage> createState() => _ChatPageState();
+  State<Dm> createState() => _DmState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _DmState extends State<Dm> {
   int charLength = 0;
 
   bool status = false;
@@ -64,10 +64,19 @@ class _ChatPageState extends State<ChatPage> {
     UserViewModel UserViewProvider = Provider.of<UserViewModel>(context);
 
     List<Users> UserProvider = UserViewProvider.usersList;
+/////////////////////////////////////////////////////////////////////77
+//
+//     ///chatrooms
+//     ChatroomViewModel ChatroomViewModelProvider =
+//         Provider.of<ChatroomViewModel>(context);
+//     List<ChatRooms> chatroomProvider = ChatroomViewModelProvider.chatroomList;
+//     ///////////////////////////////////////////////////////////////////////////
 
     ///chats
     ChatViewModel ChatViewModelProvider = Provider.of<ChatViewModel>(context);
 
+    // print("chatroomProvider uzunluk ${chatroomProvider.length}");
+    // print("chatroomProvider  ${chatroomProvider}");
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -81,13 +90,14 @@ class _ChatPageState extends State<ChatPage> {
             },
           ),
           centerTitle: true,
-          title: Text('${widget.chatRooms.name}'),
+          title: Text('${widget.user.users}'),
         ),
         body: Stack(
           children: [
             BackgroundContainer(),
             StreamBuilder<List<ChatInfo>>(
-                stream: ChatViewModelProvider.getChatList(widget.chatRooms.id),
+                stream: ChatViewModelProvider.getPrivateChatList(
+                    widget.user.userChat),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     print('dfdfd${snapshot.data}');
@@ -116,8 +126,8 @@ class _ChatPageState extends State<ChatPage> {
                                   // shrinkWrap: true,
                                   // physics: BouncingScrollPhysics(),
                                   itemCount: chatList.length,
-                                  itemBuilder: (context, index) {
-                                    ChatInfo chat = chatList[index];
+                                  itemBuilder: (context, i) {
+                                    ChatInfo chat = chatList[i];
 
                                     return buildChatArea(chat);
                                   }),
@@ -206,8 +216,9 @@ class _ChatPageState extends State<ChatPage> {
                         ChatViewModelProvider.addNewChat(
                           //  user: UserProvider[0].users,
                           message: _controller.text,
-                          chatRoomsId: widget.chatRooms.id, users: UserProvider,
-                          //   userId: widget.user.id,
+                          chatRoomsId: widget.user.userChat,
+                          users: UserProvider,
+                          // userId: widget.user.id,
                         );
 
                         _controller.clear();

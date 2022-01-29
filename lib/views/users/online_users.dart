@@ -28,13 +28,14 @@ class OnlineUsers extends StatelessWidget {
                 );
               } else {
                 List<Users> userList = snapshot.data!;
+                print('userlistsayısı ${userList}');
 
                 return ListView.builder(
                     itemCount: userList.length,
-                    itemBuilder: (context, i) {
-                      Users users = userList[i];
+                    itemBuilder: (context, index) {
+                      Users users = userList[index];
 
-                      return AllOnlineUsers(users: users);
+                      return buildAllOnlineUsers(users);
                     });
               }
             },
@@ -43,18 +44,8 @@ class OnlineUsers extends StatelessWidget {
       ),
     );
   }
-}
 
-class AllOnlineUsers extends StatelessWidget {
-  const AllOnlineUsers({
-    Key? key,
-    required this.users,
-  }) : super(key: key);
-
-  final Users users;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildAllOnlineUsers(Users users) {
     return ListTile(
       leading: Container(
         decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
