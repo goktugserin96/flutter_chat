@@ -96,8 +96,8 @@ class _DmState extends State<Dm> {
           children: [
             BackgroundContainer(),
             StreamBuilder<List<ChatInfo>>(
-                stream:
-                    ChatViewModelProvider.getPrivateChatList(widget.user.id),
+                stream: ChatViewModelProvider.getPrivateChatList(
+                    widget.user.id), //UserProvider[0].id
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     print('dfdfd${snapshot.data}');

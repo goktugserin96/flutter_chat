@@ -8,6 +8,10 @@ import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:flutter_android_app/views/users/users_view_model.dart';
 import 'package:provider/provider.dart';
 
+import 'auth/provider/email_sign_in.dart';
+import 'auth/provider/google_sign_in.dart';
+import 'auth/util/utils.dart';
+
 // const Color darkBlue = Color.fromARGB(255, 18, 32, 47);
 const AssetImage assetImage = AssetImage("assets/images/background.png");
 
@@ -23,11 +27,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(MyApp());
-
-  await FirebaseAuth.instance.signInAnonymously();
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
+  static final String title = 'Google SignIn';
   @override
   Widget build(BuildContext context) {
     print(FirebaseAuth.instance.signInAnonymously().hashCode);
@@ -38,9 +43,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
             create: (BuildContext context) => ChatViewModel()),
         ChangeNotifierProvider(
-            create: (BuildContext context) => UserViewModel())
+            create: (BuildContext context) => UserViewModel()),
+        ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
+        ChangeNotifierProvider(create: (context) => EmailSignInProvider()),
       ],
       child: MaterialApp(
+        scaffoldMessengerKey: Utils.scaffoldMessengerKey,
+        navigatorKey: navigatorKey,
         theme: ThemeData.dark(),
         //.copyWith(scaffoldBackgroundColor: darkBlue),
         home: NickNamePage(),
