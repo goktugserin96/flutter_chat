@@ -149,7 +149,7 @@ class _ChatPageState extends State<ChatPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       color: Colors.deepPurpleAccent,
       child: ListTile(
-        leading: Text('${chat.users[0].users}:'),
+        leading: Text('${chat.user}:'),
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 7),
           child: Text('${chat.message}'),
@@ -159,7 +159,9 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget buildTextField(
-      ChatViewModel ChatViewModelProvider, List<Users> UserProvider) {
+    ChatViewModel ChatViewModelProvider,
+    List<Users> UserProvider,
+  ) {
     return Card(
       child: Row(
         children: [
@@ -204,10 +206,11 @@ class _ChatPageState extends State<ChatPage> {
 
                         ///chat provider database için // chati burada atama yapıyoruz
                         ChatViewModelProvider.addNewChat(
-                          //  user: UserProvider[0].users,
+                          user: UserProvider[0].users,
                           message: _controller.text,
-                          chatRoomsId: widget.chatRooms.id, users: UserProvider,
-                          //   userId: widget.user.id,
+                          chatRoomsId: widget.chatRooms.id,
+                          //   users: UserProvider,
+                          userId: widget.user.id,
                         );
 
                         _controller.clear();

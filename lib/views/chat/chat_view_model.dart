@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_android_app/models/chat.dart';
-import 'package:flutter_android_app/models/users.dart';
 import 'package:flutter_android_app/services/calculator.dart';
 import 'package:flutter_android_app/services/chat_database.dart';
 
@@ -20,37 +19,40 @@ class ChatViewModel extends ChangeNotifier {
       .map((snapshot) =>
           snapshot.docs.map((doc) => ChatInfo.fromMap(doc.data())).toList());
 
-  Stream<List<ChatInfo>> getPrivateChatList(String userChat) =>
-      FirebaseFirestore.instance
-          .collection('chat')
-          .where('chatroomId', isEqualTo: userChat)
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => ChatInfo.fromMap(doc.data()))
-              .toList());
+  Stream<List<ChatInfo>> getPrivateChatList(String userId) => FirebaseFirestore
+      .instance
+      .collection('chat')
+      .where(
+        'chatroomId',
+        isEqualTo: userId,
+      )
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => ChatInfo.fromMap(doc.data())).toList());
 
-  Future<void> addNewChat(
-      {
-      //required String user,
-      required String message,
-      required String chatRoomsId,
-      // required String userId
-      required List<Users> users}) async {
+  Future<void> addNewChat({
+    required String user,
+    required String message,
+    required String chatRoomsId,
+    required String userId,
+    // required List<Users> users
+  }) async {
     /// Form alanındaki veriler ile önce bir book objesi oluşturacak
     final docChat = FirebaseFirestore.instance.collection('chat').doc();
-    ChatInfo newChat = ChatInfo(
-      id: docChat.id,
-      // user: user,
+
+    ChatInfo chatInfo = ChatInfo(
+      chatId: docChat.id,
+      user: user,
       message: message,
       time: Calculator.dateTimeToTimeStamp(DateTime.now()),
       chatroomId: chatRoomsId,
-      //userId: userId,
+      userId: userId,
 
-      users: users,
+      //  users: users,
     );
 
     /// bu kitap bilgisine database servisi üzerinden firestore a yazacak
     await _database.setChatData(
-        collectionPath: _collectionPath, chatAsMap: newChat.toMap());
+        collectionPath: _collectionPath, chatAsMap: chatInfo.toMap());
   }
 }

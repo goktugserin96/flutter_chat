@@ -163,14 +163,16 @@ class _chatroomPageState extends State<chatroomPage> {
               height: 200,
               child: ListView(
                   children: userList
-                      .map((e) => GestureDetector(
+                      .map((user) => GestureDetector(
                             onDoubleTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        Dm(chatRooms: chatRooms, user: e))),
+                                    builder: (context) => Dm(
+                                        chatRooms: chatRooms,
+                                        user: user,
+                                      ))),
                             child: ListTile(
-                              title: Text('${e.users}'),
+                              title: Text('${user.users}'),
                               leading: Container(
                                 decoration: BoxDecoration(
                                     color: Colors.green,

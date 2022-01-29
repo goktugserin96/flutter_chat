@@ -96,8 +96,8 @@ class _DmState extends State<Dm> {
           children: [
             BackgroundContainer(),
             StreamBuilder<List<ChatInfo>>(
-                stream: ChatViewModelProvider.getPrivateChatList(
-                    widget.user.userChat),
+                stream:
+                    ChatViewModelProvider.getPrivateChatList(widget.user.id),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     print('dfdfd${snapshot.data}');
@@ -129,7 +129,10 @@ class _DmState extends State<Dm> {
                                   itemBuilder: (context, i) {
                                     ChatInfo chat = chatList[i];
 
-                                    return buildChatArea(chat);
+                                    final isMe =
+                                        chat.userId == UserProvider[0].id;
+
+                                    return buildChatArea(chat, isMe);
                                   }),
                             ),
                           ),
@@ -154,18 +157,20 @@ class _DmState extends State<Dm> {
         ));
   }
 
-  Card buildChatArea(ChatInfo chat) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      color: Colors.deepPurpleAccent,
-      child: ListTile(
-        leading: Text('${chat.users[0].users}:'),
-        title: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 7),
-          child: Text('${chat.message}'),
-        ),
-      ),
-    );
+  Widget buildChatArea(ChatInfo chat, bool isMe) {
+    return isMe
+        ? Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            color: Colors.deepPurpleAccent,
+            child: ListTile(
+              leading: Text('${chat.user}:'),
+              title: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 7),
+                  child: Text('${chat.message}')),
+            ),
+          )
+        : Container();
   }
 
   Widget buildTextField(
@@ -214,11 +219,11 @@ class _DmState extends State<Dm> {
 
                         ///chat provider database için // chati burada atama yapıyoruz
                         ChatViewModelProvider.addNewChat(
-                          //  user: UserProvider[0].users,
+                          user: UserProvider[0].users,
                           message: _controller.text,
-                          chatRoomsId: widget.user.userChat,
-                          users: UserProvider,
-                          // userId: widget.user.id,
+                          chatRoomsId: widget.user.id,
+                          //    users: UserProvider,
+                          userId: UserProvider[0].id,
                         );
 
                         _controller.clear();

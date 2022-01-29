@@ -24,7 +24,7 @@ class ChatDatabase {
       required Map<String, dynamic> chatAsMap}) async {
     await _firestore
         .collection(collectionPath)
-        .doc(ChatInfo.fromMap(chatAsMap).id)
+        .doc(ChatInfo.fromMap(chatAsMap).chatId)
         .set(chatAsMap);
   }
 }

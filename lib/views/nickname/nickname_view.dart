@@ -91,7 +91,9 @@ class _NickNameState extends State<NickName> {
 //                 }).toList();
 
                 Provider.of<UserViewModel>(context, listen: false) // list
-                    .addNewUser(users: widget._nameController.text);
+                    .addNewUser(
+                  users: widget._nameController.text,
+                );
 
                 Navigator.push(
                     context,

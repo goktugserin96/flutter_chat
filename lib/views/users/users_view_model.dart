@@ -18,12 +18,13 @@ class UserViewModel extends ChangeNotifier {
 
   List<Users> usersList = [];
 
-  Future<void> addNewUser({
-    required String users,
-  }) async {
+  Future<void> addNewUser({required String users}) async {
     final user = FirebaseFirestore.instance.collection('chat').doc();
 
-    usersList.add(Users(users: users, id: user.id, userChat: user.id));
+    usersList.add(Users(
+      users: users,
+      id: user.id,
+    ));
 
     await _database.setUserData(
         collectionPath: _collectionPath, usersAsMap: usersList[0].toMap());
