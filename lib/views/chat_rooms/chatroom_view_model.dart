@@ -12,30 +12,10 @@ class ChatroomViewModel extends ChangeNotifier {
   ChatroomDatabase _database = ChatroomDatabase();
 
   Stream<List<ChatRooms>> getChatroomList() => FirebaseFirestore.instance
-      .collection('chatroomyeni')
+      .collection('chatrooms')
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => ChatRooms.fromMap(doc.data())).toList());
-
-  Future<void> addNewChatroomUsers({
-    required ChatRooms chatRooms,
-    required String chatRoomsName,
-    required List<Users> userList,
-  }) async {
-    /// Form alanındaki veriler ile önce bir book objesi oluşturacak
-    ///
-    //  final docUser = FirebaseFirestore.instance.collection(_collectionPath).doc();
-    ChatRooms newChatroom = ChatRooms(
-      id: chatRooms.id,
-      name: chatRoomsName,
-      chatroomUsers: userList,
-      //   chatroomUsers: usersList,
-      // chatOfChatroom: chatInfoList,
-    );
-
-    await _database.setChatroomData(
-        collectionPath: _collectionPath, chatroomAsMap: newChatroom.toMap());
-  }
 
   Future<void> deleteUser(Users users) async {
     await _database.deleteDocument(

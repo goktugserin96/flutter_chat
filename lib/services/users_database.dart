@@ -6,10 +6,6 @@ class UsersDatabase {
 
   /// FireStore servisinden kitapların verisini stream olarak alıp sağlamak
 
-  Stream<QuerySnapshot> getUsersListFromApi(String referencePath) {
-    return _firestore.collection(referencePath).snapshots();
-  }
-
   /// FireStore üzerinde bir veriyi silme hizmeti
   Future<void> deleteDocument(
       {required String referancePath, required String id}) async {
@@ -18,12 +14,12 @@ class UsersDatabase {
 
 //   }
 
-  Future<void> setUserData(
-      {required String collectionPath,
-      required Map<String, dynamic> usersAsMap}) async {
-    await _firestore
-        .collection(collectionPath)
-        .doc(Users.fromMap(usersAsMap).id)
-        .set(usersAsMap);
-  }
+  // Future<void> setUserData(
+  //     {required String collectionPath,
+  //     required Map<String, dynamic> usersAsMap}) async {
+  //   await _firestore
+  //       .collection(collectionPath)
+  //       .doc(Users.fromMap(usersAsMap).id)
+  //       .set(usersAsMap);
+  // }
 }

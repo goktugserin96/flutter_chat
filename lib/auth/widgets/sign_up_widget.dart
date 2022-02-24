@@ -2,6 +2,8 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/auth/provider/email_sign_in.dart';
+import 'package:flutter_android_app/models/users.dart';
+import 'package:flutter_android_app/provider/app_provider.dart';
 import 'package:provider/provider.dart';
 
 class SignUpWidget extends StatefulWidget {
@@ -15,6 +17,7 @@ class SignUpWidget extends StatefulWidget {
 
 class _SignUpWidgetState extends State<SignUpWidget> {
   final _registerFormKey = GlobalKey<FormState>();
+  TextEditingController _userName = TextEditingController();
   TextEditingController _registerEmail = TextEditingController();
   TextEditingController _registerSifre = TextEditingController();
   TextEditingController _registerSifreOnay = TextEditingController();
@@ -35,7 +38,6 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               Form(
                 key: _registerFormKey,
                 child: Card(
-                  color: Colors.white,
                   elevation: 10,
                   margin: EdgeInsets.only(top: 15),
                   shape: ContinuousRectangleBorder(
@@ -47,6 +49,17 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                       children: [
                         SizedBox(
                           height: 25,
+                        ),
+                        TextFormField(
+                          controller: _userName,
+                          decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.people),
+                              hintText: "Username",
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20))),
+                        ),
+                        SizedBox(
+                          height: 10,
                         ),
                         TextFormField(
                           controller: _registerEmail,
@@ -118,6 +131,13 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                 create.createUserWithEmailAndPassword(
                                     _registerEmail.text.trim(),
                                     _registerSifre.text.trim());
+
+                                final newUser = Users(
+                                  users: _userName.text.trim(),
+                                  email: _registerEmail.text.trim(),
+                                );
+                                Provider.of<AppProvider>(context, listen: false)
+                                    .createUser(newUser);
 
                                 // print("user $user");
 

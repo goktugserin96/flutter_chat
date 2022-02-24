@@ -5,12 +5,12 @@ import 'package:flutter_android_app/auth/page/verify_email_page.dart';
 
 import 'auth_page.dart';
 
-class MyHomePage extends StatefulWidget {
+class MyHomePageAuth extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePageAuth> createState() => _MyHomePageAuthState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageAuthState extends State<MyHomePageAuth> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

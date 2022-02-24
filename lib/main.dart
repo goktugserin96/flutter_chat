@@ -2,19 +2,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_android_app/views/chat/chat_view_model.dart';
+import 'package:flutter_android_app/provider/app_provider.dart';
+import 'package:flutter_android_app/services/chatroom_database.dart';
 import 'package:flutter_android_app/views/chat_rooms/chatroom_view_model.dart';
-import 'package:flutter_android_app/views/nickname/nickname_view.dart';
-import 'package:flutter_android_app/views/users/users_view_model.dart';
 import 'package:provider/provider.dart';
 
+import 'auth/page/home_page.dart';
 import 'auth/provider/email_sign_in.dart';
 import 'auth/provider/google_sign_in.dart';
 import 'auth/util/utils.dart';
+import 'data.dart';
 
 // const Color darkBlue = Color.fromARGB(255, 18, 32, 47);
 const AssetImage assetImage = AssetImage("assets/images/background.png");
 
+User? myData;
 Future<void> main() async {
   // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
   //     overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
@@ -26,6 +28,7 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await ChatroomDatabase.addChatRoomsCountries(chatroomsList);
   runApp(MyApp());
 }
 
@@ -35,15 +38,14 @@ class MyApp extends StatelessWidget {
   static final String title = 'Google SignIn';
   @override
   Widget build(BuildContext context) {
-    print(FirebaseAuth.instance.signInAnonymously().hashCode);
+    // print(FirebaseAuth.instance.signInAnonymously().hashCode);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
+          create: (BuildContext context) => AppProvider(),
+        ),
+        ChangeNotifierProvider(
             create: (BuildContext context) => ChatroomViewModel()),
-        ChangeNotifierProvider(
-            create: (BuildContext context) => ChatViewModel()),
-        ChangeNotifierProvider(
-            create: (BuildContext context) => UserViewModel()),
         ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
         ChangeNotifierProvider(create: (context) => EmailSignInProvider()),
       ],
@@ -52,7 +54,7 @@ class MyApp extends StatelessWidget {
         navigatorKey: navigatorKey,
         theme: ThemeData.dark(),
         //.copyWith(scaffoldBackgroundColor: darkBlue),
-        home: NickNamePage(),
+        home: MyHomePageAuth(),
       ),
     );
   }

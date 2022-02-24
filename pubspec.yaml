@@ -41,6 +41,10 @@ dependencies:
   google_sign_in: ^5.2.1
   email_validator: ^2.0.1
   flutter_signin_button: ^2.0.0
+  bubble: ^1.2.1
+
+
+
 
 
   # The following adds the Cupertino Icons font to your application.

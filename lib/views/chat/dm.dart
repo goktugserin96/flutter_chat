@@ -1,23 +1,22 @@
+import 'package:bubble/bubble.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/models/chat.dart';
-import 'package:flutter_android_app/models/chat_rooms.dart';
 import 'package:flutter_android_app/models/users.dart';
+import 'package:flutter_android_app/provider/app_provider.dart';
 import 'package:flutter_android_app/views/chat_rooms/chatroom_view_model.dart';
 import 'package:flutter_android_app/views/nickname/nickname_view.dart';
-import 'package:flutter_android_app/views/screens/screens_page_view.dart';
-import 'package:flutter_android_app/views/users/users_view_model.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
 
 class Dm extends StatefulWidget {
-  final ChatRooms chatRooms;
   final Users user;
 
   const Dm({
     Key? key,
-    required this.chatRooms,
     required this.user,
 
     // required this.online
@@ -27,6 +26,17 @@ class Dm extends StatefulWidget {
 }
 
 class _DmState extends State<Dm> {
+  QuerySnapshot<Map<String, dynamic>>? chatData;
+
+  void getData() async {
+    await FirebaseFirestore.instance
+        .collection('chat')
+        .where('chatroomId', isEqualTo: widget.user.id)
+        .where('userId', isEqualTo: data!.docs.first.id)
+        .get()
+        .then((value) => chatData = value);
+  }
+
   int charLength = 0;
 
   bool status = false;
@@ -61,22 +71,8 @@ class _DmState extends State<Dm> {
     // print('${widget.usersList.length}');
 
     ///users
-    UserViewModel UserViewProvider = Provider.of<UserViewModel>(context);
+    AppProvider appProvider = Provider.of<AppProvider>(context);
 
-    List<Users> UserProvider = UserViewProvider.usersList;
-/////////////////////////////////////////////////////////////////////77
-//
-//     ///chatrooms
-//     ChatroomViewModel ChatroomViewModelProvider =
-//         Provider.of<ChatroomViewModel>(context);
-//     List<ChatRooms> chatroomProvider = ChatroomViewModelProvider.chatroomList;
-//     ///////////////////////////////////////////////////////////////////////////
-
-    ///chats
-    ChatViewModel ChatViewModelProvider = Provider.of<ChatViewModel>(context);
-
-    // print("chatroomProvider uzunluk ${chatroomProvider.length}");
-    // print("chatroomProvider  ${chatroomProvider}");
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -85,8 +81,10 @@ class _DmState extends State<Dm> {
               await Provider.of<ChatroomViewModel>(context, listen: false)
                   .deleteUser(widget.user);
 
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()));
+              Navigator.pop(context);
+
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => MyHomePage()));
             },
           ),
           centerTitle: true,
@@ -94,10 +92,10 @@ class _DmState extends State<Dm> {
         ),
         body: Stack(
           children: [
-            BackgroundContainer(),
+            BackgroundContainer,
             StreamBuilder<List<ChatInfo>>(
-                stream: ChatViewModelProvider.getPrivateChatList(
-                    widget.user.id), //UserProvider[0].id
+                stream: ChatViewModel.getPrivateChatList(
+                    data!.docs.first.id, widget.user.id), //UserProvider[0].id
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     print('dfdfd${snapshot.data}');
@@ -112,11 +110,7 @@ class _DmState extends State<Dm> {
                     );
                   } else {
                     List<ChatInfo>? chatList = snapshot.data;
-                    //  userList.add(chatInfoUser!.user);
-                    print('uzunluk ${chatList!.length}');
-                    // print('kelime sayısı ${charLength}');
-                    // print(
-                    //     'ChatViewModelProvider ${ChatViewModelProvider.chatInfoList.length}');
+
                     return Container(
                       child: Column(
                         children: [
@@ -125,14 +119,28 @@ class _DmState extends State<Dm> {
                               child: ListView.builder(
                                   // shrinkWrap: true,
                                   // physics: BouncingScrollPhysics(),
-                                  itemCount: chatList.length,
+                                  itemCount: chatList!.length,
                                   itemBuilder: (context, i) {
                                     ChatInfo chat = chatList[i];
 
-                                    final isMe =
-                                        chat.userId == UserProvider[0].id;
+                                    final isMe = chat.userId ==
+                                            widget.user.id &&
+                                        chat.chatroomId == data!.docs.first.id;
 
-                                    return buildChatArea(chat, isMe);
+                                    final deneme1 =
+                                        chat.chatroomId == data!.docs.first.id;
+
+                                    final deneme2 =
+                                        chat.userId == widget.user.id;
+
+                                    final deneme3 =
+                                        chat.chatroomId == widget.user.id;
+
+                                    final deneme4 =
+                                        chat.userId == data!.docs.first.id;
+
+                                    return buildChatArea(chat, isMe, deneme1,
+                                        deneme2, deneme3, deneme4);
                                   }),
                             ),
                           ),
@@ -145,8 +153,7 @@ class _DmState extends State<Dm> {
                                 )
                               ],
                             ),
-                            child: buildTextField(
-                                ChatViewModelProvider, UserProvider),
+                            child: buildTextField(appProvider),
                           ),
                         ],
                       ),
@@ -157,24 +164,24 @@ class _DmState extends State<Dm> {
         ));
   }
 
-  Widget buildChatArea(ChatInfo chat, bool isMe) {
-    return isMe
-        ? Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            color: Colors.deepPurpleAccent,
-            child: ListTile(
-              leading: Text('${chat.user}:'),
-              title: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 7),
-                  child: Text('${chat.message}')),
+  Widget buildChatArea(
+      ChatInfo chat, bool isMe, bool deneme1, bool deneme2, deneme3, deneme4) {
+    return (deneme1 && deneme2) || (deneme3 && deneme4)
+        ? Bubble(
+            margin: const BubbleEdges.only(top: 10),
+            alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+            nipWidth: 6,
+            nipHeight: 5,
+            nip: isMe ? BubbleNip.rightTop : BubbleNip.leftTop,
+            color: isMe ? Colors.green : Colors.amberAccent,
+            child: Text(
+              '${chat.message}',
             ),
           )
         : Container();
   }
 
-  Widget buildTextField(
-      ChatViewModel ChatViewModelProvider, List<Users> UserProvider) {
+  Widget buildTextField(AppProvider ChatViewModelProvider) {
     return Card(
       child: Row(
         children: [
@@ -218,13 +225,16 @@ class _DmState extends State<Dm> {
                         status = false;
 
                         ///chat provider database için // chati burada atama yapıyoruz
-                        ChatViewModelProvider.addNewChat(
-                          user: UserProvider[0].users,
-                          message: _controller.text,
-                          chatRoomsId: widget.user.id,
-                          //    users: UserProvider,
-                          userId: UserProvider[0].id,
-                        );
+                        ///
+                        ///
+                        ///
+                        final newChat = ChatInfo(
+                            chatroomId: data!.docs.first.id,
+                            user: data!.docs.first.data()['users'] ?? "",
+                            message: _controller.text,
+                            time: DateTime.now(),
+                            userId: widget.user.id);
+                        ChatViewModelProvider.createChat(newChat);
 
                         _controller.clear();
                       },

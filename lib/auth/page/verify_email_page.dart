@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/auth/provider/email_sign_in.dart';
-import 'package:flutter_android_app/views/nickname/nickname_view.dart';
+import 'package:flutter_android_app/views/screens/screens_page_view.dart';
 import 'package:provider/provider.dart';
+
+import '../../main.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({Key? key}) : super(key: key);
@@ -51,6 +53,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     await FirebaseAuth.instance.currentUser!.reload();
     setState(() {
       isEmailVerify = FirebaseAuth.instance.currentUser!.emailVerified;
+      myData = FirebaseAuth.instance.currentUser!;
     });
     if (isEmailVerify) timer?.cancel();
   }
@@ -60,8 +63,10 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     // var sendVerificationEmail =
     //     Provider.of<EmailSignInProvider>(context, listen: false)
     //         .SendVerificationEmail();
+
+    myData = FirebaseAuth.instance.currentUser!;
     return isEmailVerify
-        ? NickNamePage()
+        ? ScreensPage(mail: myData!.email!)
         : Scaffold(
             appBar: AppBar(
               title: Text("Verify Email"),
@@ -100,7 +105,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                           minimumSize: Size.fromHeight(15)),
                       onPressed: () => FirebaseAuth.instance.signOut(),
                       child: Text(
-                        "Cancel",
+                        "Go Back",
                         style: TextStyle(fontSize: 16),
                       ))
                 ],

@@ -1,18 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class ChatInfoField {
+  static const time = 'time';
+}
+
 class ChatInfo {
   final String chatId;
   final String chatroomId;
   final String user;
   final String message;
-  final Timestamp time;
+  final DateTime time;
   final String userId;
   //final List<Users> users;
 
   ChatInfo({
-    required this.chatId,
+    this.chatId = "",
     required this.chatroomId,
-    required this.user,
+    this.user = "",
     required this.message,
     required this.time,
     required this.userId,
@@ -41,7 +45,7 @@ class ChatInfo {
         chatroomId: map['chatroomId'],
         user: map['user'],
         message: map['message'],
-        time: map['time'],
+        time: (map['time'] as Timestamp).toDate(),
         userId: map['userId'],
         // users: List<Users>.from(
         //   map['users'].map(

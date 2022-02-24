@@ -1,15 +1,20 @@
-import 'package:flutter_android_app/models/users.dart';
-
 class ChatRooms {
   final String id;
   final String name;
-  final List<Users> chatroomUsers;
+  final String flagImage;
 
-  ChatRooms({
-    required this.id,
-    required this.name,
-    required this.chatroomUsers,
-  });
+  // final List<Users> chatroomUsers;
+
+  ChatRooms({this.id = "", required this.name, required this.flagImage
+      // required this.chatroomUsers,
+      });
+
+  ChatRooms copyWith({
+    required String id,
+    required String name,
+    required String flagImage,
+  }) =>
+      ChatRooms(id: id, name: name, flagImage: flagImage);
 
   Map<String, dynamic> toMap() => {
         // List<Map<String, dynamic>> borrows =
@@ -17,8 +22,9 @@ class ChatRooms {
 
         'id': id,
         'name': name,
-        'chatroomUsers':
-            List<dynamic>.from(chatroomUsers.map((x) => x.toMap())),
+        'flagImage': flagImage,
+        // 'chatroomUsers':
+        //     List<dynamic>.from(chatroomUsers.map((x) => x.toMap())),
       };
 
   /// bir de mapten obje oluştran bir yapıcıya ihtiyacımız var.
@@ -26,10 +32,11 @@ class ChatRooms {
   factory ChatRooms.fromMap(Map map) => ChatRooms(
         id: map['id'],
         name: map['name'],
-        chatroomUsers: List<Users>.from(
-          map['chatroomUsers'].map(
-            (x) => Users.fromMap(x),
-          ),
-        ),
+        flagImage: map['flagImage'],
+        // chatroomUsers: List<Users>.from(
+        //   map['chatroomUsers'].map(
+        //     (x) => Users.fromMap(x),
+        //   ),
+        // ),
       );
 }

@@ -22,13 +22,16 @@ class LoginWidget extends StatefulWidget {
 
 class _LoginWidgetState extends State<LoginWidget> {
   final _signInFormKey = GlobalKey<FormState>();
+  TextEditingController _userName = TextEditingController();
   TextEditingController _signInEmail = TextEditingController();
+
   TextEditingController _signInPassword = TextEditingController();
 
   @override
   void dispose() {
     _signInEmail.dispose();
     _signInPassword.dispose();
+    _userName.dispose();
     super.dispose();
   }
 
@@ -128,6 +131,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                   //   //  await Provider.of<EmailSignInProvider>(context, listen: false).SignOutt();
                                   // }
                                   // Navigator.pop(context);
+
                                 }
                               },
                               child: Text("Sign In")),

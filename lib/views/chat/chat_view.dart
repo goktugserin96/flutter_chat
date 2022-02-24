@@ -2,23 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/models/chat.dart';
 import 'package:flutter_android_app/models/chat_rooms.dart';
-import 'package:flutter_android_app/models/users.dart';
-import 'package:flutter_android_app/views/chat_rooms/chatroom_view_model.dart';
 import 'package:flutter_android_app/views/nickname/nickname_view.dart';
-import 'package:flutter_android_app/views/screens/screens_page_view.dart';
-import 'package:flutter_android_app/views/users/users_view_model.dart';
 import 'package:provider/provider.dart';
 
+import '../../provider/app_provider.dart';
+import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
 
 class ChatPage extends StatefulWidget {
   final ChatRooms chatRooms;
-  final Users user;
 
   const ChatPage({
     Key? key,
     required this.chatRooms,
-    required this.user,
 
     // required this.online
   }) : super(key: key);
@@ -58,26 +54,20 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    // print('${widget.usersList.length}');
-
-    ///users
-    UserViewModel UserViewProvider = Provider.of<UserViewModel>(context);
-
-    List<Users> UserProvider = UserViewProvider.usersList;
-
-    ///chats
-    ChatViewModel ChatViewModelProvider = Provider.of<ChatViewModel>(context);
+    AppProvider appProvider = Provider.of<AppProvider>(context);
 
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
-              await Provider.of<ChatroomViewModel>(context, listen: false)
-                  .deleteUser(widget.user);
+              // await Provider.of<ChatroomViewModel>(context, listen: false)
+              //     .deleteUser(widget.user);
 
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()));
+              Navigator.pop(context);
+
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => MyHomePage()));
             },
           ),
           centerTitle: true,
@@ -85,9 +75,9 @@ class _ChatPageState extends State<ChatPage> {
         ),
         body: Stack(
           children: [
-            BackgroundContainer(),
+            BackgroundContainer,
             StreamBuilder<List<ChatInfo>>(
-                stream: ChatViewModelProvider.getChatList(widget.chatRooms.id),
+                stream: ChatViewModel.getChatList(widget.chatRooms.id),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     print('dfdfd${snapshot.data}');
@@ -103,7 +93,7 @@ class _ChatPageState extends State<ChatPage> {
                   } else {
                     List<ChatInfo>? chatList = snapshot.data;
                     //  userList.add(chatInfoUser!.user);
-                    print('uzunluk ${chatList!.length}');
+                    //  print('uzunluk ${chatList!.length}');
                     // print('kelime sayısı ${charLength}');
                     // print(
                     //     'ChatViewModelProvider ${ChatViewModelProvider.chatInfoList.length}');
@@ -115,7 +105,7 @@ class _ChatPageState extends State<ChatPage> {
                               child: ListView.builder(
                                   // shrinkWrap: true,
                                   // physics: BouncingScrollPhysics(),
-                                  itemCount: chatList.length,
+                                  itemCount: chatList!.length,
                                   itemBuilder: (context, index) {
                                     ChatInfo chat = chatList[index];
 
@@ -132,8 +122,7 @@ class _ChatPageState extends State<ChatPage> {
                                 )
                               ],
                             ),
-                            child: buildTextField(
-                                ChatViewModelProvider, UserProvider),
+                            child: buildTextField(appProvider),
                           ),
                         ],
                       ),
@@ -159,8 +148,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget buildTextField(
-    ChatViewModel ChatViewModelProvider,
-    List<Users> UserProvider,
+    AppProvider ChatViewModelProvider,
   ) {
     return Card(
       child: Row(
@@ -204,14 +192,13 @@ class _ChatPageState extends State<ChatPage> {
                       onPressed: () {
                         status = false;
 
-                        ///chat provider database için // chati burada atama yapıyoruz
-                        ChatViewModelProvider.addNewChat(
-                          user: UserProvider[0].users,
-                          message: _controller.text,
-                          chatRoomsId: widget.chatRooms.id,
-                          //   users: UserProvider,
-                          userId: widget.user.id,
-                        );
+                        final newChat = ChatInfo(
+                            chatroomId: widget.chatRooms.id,
+                            user: data!.docs.first.data()['users'] ?? "",
+                            message: _controller.text,
+                            time: DateTime.now(),
+                            userId: data!.docs.first.id);
+                        ChatViewModelProvider.createChat(newChat);
 
                         _controller.clear();
                       },
