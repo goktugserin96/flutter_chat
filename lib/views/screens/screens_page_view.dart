@@ -93,8 +93,6 @@ class _ScreensPageState extends State<ScreensPage> {
                 } else {
                   List<Users> userList = snapshot.data!;
 
-                  // print('${FirebaseAuth.instance.currentUser!.uid.}');
-
                   Provider.of<AppProvider>(context).setUsers(userList);
                   return PageView(
                     controller: controller,

@@ -148,7 +148,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget buildTextField(
-    AppProvider ChatViewModelProvider,
+    AppProvider chatViewModelProvider,
   ) {
     return Card(
       child: Row(
@@ -198,7 +198,7 @@ class _ChatPageState extends State<ChatPage> {
                             message: _controller.text,
                             time: DateTime.now(),
                             userId: data!.docs.first.id);
-                        ChatViewModelProvider.createChat(newChat);
+                        chatViewModelProvider.createChat(newChat);
 
                         _controller.clear();
                       },
