@@ -3,9 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/models/chat.dart';
-import 'package:flutter_android_app/models/users.dart';
 import 'package:flutter_android_app/provider/app_provider.dart';
-import 'package:flutter_android_app/views/chat_rooms/chatroom_view_model.dart';
 import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
 
@@ -13,11 +11,15 @@ import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
 
 class Dm extends StatefulWidget {
-  final Users user;
+  // final Users user;
+  final String userId;
+  final String userName;
 
   const Dm({
     Key? key,
-    required this.user,
+    // required this.user,
+    required this.userId,
+    required this.userName,
 
     // required this.online
   }) : super(key: key);
@@ -31,7 +33,7 @@ class _DmState extends State<Dm> {
   void getData() async {
     await FirebaseFirestore.instance
         .collection('chat')
-        .where('chatroomId', isEqualTo: widget.user.id)
+        .where('chatroomId', isEqualTo: widget.userId)
         .where('userId', isEqualTo: data!.docs.first.id)
         .get()
         .then((value) => chatData = value);
@@ -78,8 +80,8 @@ class _DmState extends State<Dm> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
-              await Provider.of<ChatroomViewModel>(context, listen: false)
-                  .deleteUser(widget.user);
+              // await Provider.of<ChatroomViewModel>(context, listen: false)
+              //     .deleteUser(widget.user);
 
               Navigator.pop(context);
 
@@ -88,14 +90,14 @@ class _DmState extends State<Dm> {
             },
           ),
           centerTitle: true,
-          title: Text('${widget.user.users}'),
+          title: Text('${widget.userName}'),
         ),
         body: Stack(
           children: [
             BackgroundContainer,
             StreamBuilder<List<ChatInfo>>(
                 stream: ChatViewModel.getPrivateChatList(
-                    data!.docs.first.id, widget.user.id), //UserProvider[0].id
+                    data!.docs.first.id, widget.userId), //UserProvider[0].id
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     print('dfdfd${snapshot.data}');
@@ -111,6 +113,8 @@ class _DmState extends State<Dm> {
                   } else {
                     List<ChatInfo>? chatList = snapshot.data;
 
+                    Provider.of<AppProvider>(context).setChats(chatList!);
+
                     return Container(
                       child: Column(
                         children: [
@@ -119,28 +123,38 @@ class _DmState extends State<Dm> {
                               child: ListView.builder(
                                   // shrinkWrap: true,
                                   // physics: BouncingScrollPhysics(),
-                                  itemCount: chatList!.length,
+                                  itemCount: chatList.length,
                                   itemBuilder: (context, i) {
                                     ChatInfo chat = chatList[i];
+                                    // Provider.of<AppProvider>(context)
+                                    //     .deneme(chat);
 
-                                    final isMe = chat.userId ==
-                                            widget.user.id &&
+                                    final isMe = chat.userId == widget.userId &&
                                         chat.chatroomId == data!.docs.first.id;
 
                                     final deneme1 =
                                         chat.chatroomId == data!.docs.first.id;
 
                                     final deneme2 =
-                                        chat.userId == widget.user.id;
+                                        chat.userId == widget.userId;
 
                                     final deneme3 =
-                                        chat.chatroomId == widget.user.id;
+                                        chat.chatroomId == widget.userId;
 
                                     final deneme4 =
                                         chat.userId == data!.docs.first.id;
 
-                                    return buildChatArea(chat, isMe, deneme1,
-                                        deneme2, deneme3, deneme4);
+                                    return
+                                        // chatBuild(chat,isMe,deneme1,deneme2,deneme3,deneme4)
+                                        //
+                                        //
+                                        // (deneme1 && deneme2) ||
+                                        //       (deneme3 && deneme4)
+                                        //   ? DmChatWidget(isMe: isMe, chat: chat)
+                                        //   : Container();
+
+                                        buildChatArea(chat, isMe, deneme1,
+                                            deneme2, deneme3, deneme4);
                                   }),
                             ),
                           ),
@@ -153,7 +167,7 @@ class _DmState extends State<Dm> {
                                 )
                               ],
                             ),
-                            child: buildTextField(appProvider),
+                            child: buildTextField(appProvider, chatList),
                           ),
                         ],
                       ),
@@ -181,7 +195,8 @@ class _DmState extends State<Dm> {
         : Container();
   }
 
-  Widget buildTextField(AppProvider ChatViewModelProvider) {
+  Widget buildTextField(
+      AppProvider ChatViewModelProvider, List<ChatInfo> chatList) {
     return Card(
       child: Row(
         children: [
@@ -230,11 +245,15 @@ class _DmState extends State<Dm> {
                         ///
                         final newChat = ChatInfo(
                             chatroomId: data!.docs.first.id,
-                            user: data!.docs.first.data()['users'] ?? "",
+                            senderUser: data!.docs.first.data()['users'] ?? "",
+                            receiverUser: widget.userName,
                             message: _controller.text,
                             time: DateTime.now(),
-                            userId: widget.user.id);
+                            userId: widget.userId);
                         ChatViewModelProvider.createChat(newChat);
+
+                        // ChatViewModelProvider.updateUsersIsOnline(
+                        //     widget.user, widget.user.id, chatList);
 
                         _controller.clear();
                       },

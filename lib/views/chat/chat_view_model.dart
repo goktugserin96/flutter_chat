@@ -34,7 +34,8 @@ class ChatViewModel {
 
     ChatInfo chatInfo = ChatInfo(
       chatId: docChat.id,
-      user: chat.user,
+      senderUser: chat.senderUser,
+      receiverUser: chat.receiverUser,
       message: chat.message,
       time: DateTime.now(),
       chatroomId: chat.chatroomId,

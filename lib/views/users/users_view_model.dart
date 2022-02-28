@@ -19,14 +19,15 @@ class UserViewModel {
     await user.update(users.toMap());
   }
 
-  static Future<void> addNewUser({required Users users}) async {
+  static Future<void> addNewUser(
+      {required Users users, required bool isOnline}) async {
     final user = FirebaseFirestore.instance.collection('users').doc();
 
     Users newUsers = Users(
       users: users.users,
       id: user.id,
       email: users.email,
-      isOnline: users.isOnline,
+      isOnline: isOnline,
     );
 
     await user.set(newUsers.toMap());

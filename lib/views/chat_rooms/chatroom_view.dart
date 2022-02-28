@@ -41,7 +41,8 @@ class _ChatroomPageState extends State<ChatroomPage> {
             icon: Icon(Icons.person),
             onPressed: () {},
           ),
-          title: Text('${data!.docs.first.data()['users'] ?? ""}'),
+          title:
+              Center(child: Text('${data!.docs.first.data()['users'] ?? ""}')),
           actions: [
             IconButton(
               onPressed: () {
@@ -149,8 +150,6 @@ class _ChatroomPageState extends State<ChatroomPage> {
 
   Widget buildOnlineUsers(int index, ChatRooms chatRooms, BuildContext context,
       List<Users> userList) {
-    bool showOne = false;
-
     return Visibility(
       maintainSize: true,
       maintainAnimation: true,
@@ -171,7 +170,9 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => Dm(
-                                          user: user,
+                                          userId: user.id,
+                                          userName: user.users,
+                                          // user: user,
                                         ))),
                             child: ListTile(
                               title: Text('${user.users}'),

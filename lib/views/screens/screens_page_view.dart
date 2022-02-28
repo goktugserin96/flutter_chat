@@ -45,33 +45,34 @@ class _ScreensPageState extends State<ScreensPage> {
     });
   }
 
-  // void updateOnlineUsers() {
-  //   myData = FirebaseAuth.instance.currentUser!;
-  //
-  //   userList.map((e) {
-  //     Provider.of<AppProvider>(context, listen: false)
-  //         .updateUsersIsOnline(e, true, e.id);
-  //   }).toList();
-  // }
-
-  // Future updateOnline() async {
-  //   var provider = Provider.of<AppProvider>(context);
-  //
-  //   Future.delayed(const Duration(milliseconds: 500), () {
-  //     setState(() {
-  //       final newUsers = Users(
-  //           users: data!.docs.first.data()['users'] ?? "", email: widget.mail);
-  //
-  //       provider.updateUsersIsOnline(newUsers, true, data!.docs.first.id);
-  //     });
-  //   });
-  // }
-
+  int selectedIndex = 0;
   final controller = PageController();
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> tabs = [ChatroomPage(), OnlineUsers()];
     return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        unselectedItemColor: Colors.white.withOpacity(0.7), //saydamlaştırma
+        selectedItemColor: Colors.white,
+        backgroundColor: Theme.of(context).primaryColor,
+        currentIndex: selectedIndex,
+        onTap: (index) {
+          setState(() {
+            selectedIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.meeting_room),
+            label: 'Chatrooms',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_alt_sharp),
+            label: 'Friends',
+          )
+        ],
+      ),
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(),
@@ -94,13 +95,7 @@ class _ScreensPageState extends State<ScreensPage> {
                   List<Users> userList = snapshot.data!;
 
                   Provider.of<AppProvider>(context).setUsers(userList);
-                  return PageView(
-                    controller: controller,
-                    children: [
-                      ChatroomPage(),
-                      OnlineUsers(),
-                    ],
-                  );
+                  return tabs[selectedIndex];
                 }
               },
             ),

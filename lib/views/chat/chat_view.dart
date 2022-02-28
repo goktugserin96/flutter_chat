@@ -61,13 +61,7 @@ class _ChatPageState extends State<ChatPage> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
-              // await Provider.of<ChatroomViewModel>(context, listen: false)
-              //     .deleteUser(widget.user);
-
               Navigator.pop(context);
-
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => MyHomePage()));
             },
           ),
           centerTitle: true,
@@ -92,11 +86,7 @@ class _ChatPageState extends State<ChatPage> {
                     );
                   } else {
                     List<ChatInfo>? chatList = snapshot.data;
-                    //  userList.add(chatInfoUser!.user);
-                    //  print('uzunluk ${chatList!.length}');
-                    // print('kelime sayısı ${charLength}');
-                    // print(
-                    //     'ChatViewModelProvider ${ChatViewModelProvider.chatInfoList.length}');
+
                     return Container(
                       child: Column(
                         children: [
@@ -138,7 +128,7 @@ class _ChatPageState extends State<ChatPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       color: Colors.deepPurpleAccent,
       child: ListTile(
-        leading: Text('${chat.user}:'),
+        leading: Text('${chat.senderUser}:'),
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 7),
           child: Text('${chat.message}'),
@@ -194,7 +184,9 @@ class _ChatPageState extends State<ChatPage> {
 
                         final newChat = ChatInfo(
                             chatroomId: widget.chatRooms.id,
-                            user: data!.docs.first.data()['users'] ?? "",
+                            senderUser: data!.docs.first.data()['users'] ?? "",
+                            receiverUser:
+                                data!.docs.first.data()['users'] ?? "",
                             message: _controller.text,
                             time: DateTime.now(),
                             userId: data!.docs.first.id);

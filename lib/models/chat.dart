@@ -7,7 +7,8 @@ class ChatInfoField {
 class ChatInfo {
   final String chatId;
   final String chatroomId;
-  final String user;
+  final String senderUser;
+  final String receiverUser;
   final String message;
   final DateTime time;
   final String userId;
@@ -16,7 +17,8 @@ class ChatInfo {
   ChatInfo({
     this.chatId = "",
     required this.chatroomId,
-    this.user = "",
+    this.senderUser = "",
+    this.receiverUser = "",
     required this.message,
     required this.time,
     required this.userId,
@@ -31,7 +33,8 @@ class ChatInfo {
 
         'chatId': chatId,
         'chatroomId': chatroomId,
-        'user': user,
+        'senderUser': senderUser,
+        'receiverUser': receiverUser,
         'message': message,
         'time': time,
         'userId': userId,
@@ -43,7 +46,8 @@ class ChatInfo {
   factory ChatInfo.fromMap(Map map) => ChatInfo(
         chatId: map['chatId'],
         chatroomId: map['chatroomId'],
-        user: map['user'],
+        senderUser: map['senderUser'],
+        receiverUser: map['receiverUser'],
         message: map['message'],
         time: (map['time'] as Timestamp).toDate(),
         userId: map['userId'],

@@ -3,8 +3,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/auth/provider/email_sign_in.dart';
 import 'package:flutter_android_app/models/users.dart';
-import 'package:flutter_android_app/provider/app_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../../views/users/users_view_model.dart';
 
 class SignUpWidget extends StatefulWidget {
   const SignUpWidget({Key? key, required this.onClickedSignIn})
@@ -133,11 +134,11 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                     _registerSifre.text.trim());
 
                                 final newUser = Users(
-                                  users: _userName.text.trim(),
-                                  email: _registerEmail.text.trim(),
-                                );
-                                Provider.of<AppProvider>(context, listen: false)
-                                    .createUser(newUser);
+                                    users: _userName.text.trim(),
+                                    email: _registerEmail.text.trim());
+
+                                UserViewModel.addNewUser(
+                                    users: newUser, isOnline: false);
 
                                 // print("user $user");
 
