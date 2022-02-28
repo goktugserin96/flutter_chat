@@ -11,6 +11,15 @@ class ChatroomViewModel extends ChangeNotifier {
   String _collectionPath = 'chatroomyeni';
   ChatroomDatabase _database = ChatroomDatabase();
 
+  List<Users> _chatroomUserList = [];
+
+  List<Users> get chatroomUserList => _chatroomUserList;
+
+  void chatUsersAdd(Users users) {
+    _chatroomUserList.add(users);
+    notifyListeners();
+  }
+
   Stream<List<ChatRooms>> getChatroomList() => FirebaseFirestore.instance
       .collection('chatrooms')
       .snapshots()

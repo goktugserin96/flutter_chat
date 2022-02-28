@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_android_app/models/chat.dart';
+import 'package:flutter_android_app/views/users/users_view_model.dart';
 
 import '../models/users.dart';
 import '../views/chat/chat_view_model.dart';
@@ -8,6 +9,9 @@ class AppProvider extends ChangeNotifier {
   List<Users> _usersList = [];
 
   List<Users> get usersList => _usersList;
+
+  // List<Users> get chatroomsUsers =>
+  //     _usersList.where((element) => element.isOnline == true).toList();
 
   List<ChatInfo> _chatList = [];
 
@@ -22,6 +26,13 @@ class AppProvider extends ChangeNotifier {
   //   notifyListeners();
   //
   // }
+
+  void updateUsers(Users users, String chatroomId, String userId) {
+    users.chatRoomId = chatroomId;
+
+    UserViewModel.updateUserOnline(
+        users: users, chatroomId: chatroomId, userId: userId);
+  }
 
   void setChats(List<ChatInfo> chats) {
     WidgetsBinding.instance!.addPostFrameCallback((_) {

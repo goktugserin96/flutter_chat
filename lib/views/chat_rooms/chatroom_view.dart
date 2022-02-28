@@ -29,9 +29,15 @@ class _ChatroomPageState extends State<ChatroomPage> {
   @override
   Widget build(BuildContext context) {
     ///users
-    AppProvider UserViewProvider = Provider.of<AppProvider>(context);
+    AppProvider userViewProvider = Provider.of<AppProvider>(context);
     //
 
+    // ChatroomViewModel chatroomViewModel =
+    //     Provider.of<ChatroomViewModel>(context);
+    var user = Users(
+        users: data!.docs.first.data()['users'],
+        email: FirebaseAuth.instance.currentUser!.email,
+        id: data!.docs.first.id);
 ///////////////////////////////////////////////////////////////////////77
     return SafeArea(
       child: Scaffold(
@@ -47,6 +53,8 @@ class _ChatroomPageState extends State<ChatroomPage> {
             IconButton(
               onPressed: () {
                 FirebaseAuth.instance.signOut();
+
+                userViewProvider.updateUsers(user, "", data!.docs.first.id);
               },
               icon: Icon(Icons.logout),
             )
@@ -103,6 +111,9 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                           _visible = !_visible;
                                         });
 
+                                        userViewProvider.updateUsers(user,
+                                            chatRooms.id, data!.docs.first.id);
+
                                         // Provider.of<ChatroomViewModel>(context,
                                         //         listen: false)
                                         //     .addNewChatroomUsers(
@@ -134,8 +145,13 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                     ),
                                   ),
                                 ),
-                                buildOnlineUsers(index, chatRooms, context,
-                                    UserViewProvider.usersList),
+                                buildOnlineUsers(
+                                  index,
+                                  chatRooms,
+                                  context,
+                                  userViewProvider.usersList,
+                                  // chatroomViewModel
+                                ),
                               ],
                             );
                           }),
@@ -148,8 +164,13 @@ class _ChatroomPageState extends State<ChatroomPage> {
     );
   }
 
-  Widget buildOnlineUsers(int index, ChatRooms chatRooms, BuildContext context,
-      List<Users> userList) {
+  Widget buildOnlineUsers(
+    int index,
+    ChatRooms chatRooms,
+    BuildContext context,
+    List<Users> userList,
+    // ChatroomViewModel chatroomViewModel
+  ) {
     return Visibility(
       maintainSize: true,
       maintainAnimation: true,
@@ -164,7 +185,9 @@ class _ChatroomPageState extends State<ChatroomPage> {
               height: 200,
               child: ListView(
                   children: userList
-                      .where((element) => element.id != data!.docs.first.id)
+                      .where((element) =>
+                          element.id != data!.docs.first.id &&
+                          element.chatRoomId == chatRooms.id)
                       .map((user) => GestureDetector(
                             onDoubleTap: () => Navigator.push(
                                 context,

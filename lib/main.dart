@@ -54,7 +54,9 @@ class MyApp extends StatelessWidget {
         navigatorKey: navigatorKey,
         theme: ThemeData.dark(),
         //.copyWith(scaffoldBackgroundColor: darkBlue),
-        home: MyHomePageAuth(),
+        home:
+            //ExitPage()
+            MyHomePageAuth(),
       ),
     );
   }

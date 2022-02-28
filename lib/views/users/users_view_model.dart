@@ -13,7 +13,9 @@ class UserViewModel {
           snapshot.docs.map((doc) => Users.fromMap(doc.data())).toList());
 
   static Future<void> updateUserOnline(
-      {required Users users, required String userId}) async {
+      {required Users users,
+      required String chatroomId,
+      required String userId}) async {
     final user = FirebaseFirestore.instance.collection('users').doc(userId);
 
     await user.update(users.toMap());
@@ -24,11 +26,11 @@ class UserViewModel {
     final user = FirebaseFirestore.instance.collection('users').doc();
 
     Users newUsers = Users(
-      users: users.users,
-      id: user.id,
-      email: users.email,
-      isOnline: isOnline,
-    );
+        users: users.users,
+        id: user.id,
+        email: users.email,
+        isOnline: isOnline,
+        chatRoomId: users.chatRoomId);
 
     await user.set(newUsers.toMap());
   }

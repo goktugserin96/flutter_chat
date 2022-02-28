@@ -50,7 +50,10 @@ class _ScreensPageState extends State<ScreensPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> tabs = [ChatroomPage(), OnlineUsers()];
+    List<Widget> tabs = [
+      ChatroomPage(),
+      OnlineUsers(),
+    ];
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.white.withOpacity(0.7), //saydamlaştırma
