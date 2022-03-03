@@ -10,6 +10,8 @@ import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
 
 import '../../provider/app_provider.dart';
+import '../../utils/translations.dart';
+import '../../widgets/title_widget.dart';
 import '../screens/screens_page_view.dart';
 
 class ChatroomPage extends StatefulWidget {
@@ -23,14 +25,17 @@ class ChatroomPage extends StatefulWidget {
 
 class _ChatroomPageState extends State<ChatroomPage> {
   int selected = 0;
-
+  String? translatedMessage;
   bool _visible = false;
+  String language1 = Translations.languages.first;
+  String language2 = Translations.languages.first;
 
   @override
   Widget build(BuildContext context) {
+    // deneme();
+
     ///users
-    AppProvider userViewProvider = Provider.of<AppProvider>(context);
-    //
+    AppProvider provider = Provider.of<AppProvider>(context);
 
     // ChatroomViewModel chatroomViewModel =
     //     Provider.of<ChatroomViewModel>(context);
@@ -38,23 +43,21 @@ class _ChatroomPageState extends State<ChatroomPage> {
         users: data!.docs.first.data()['users'],
         email: FirebaseAuth.instance.currentUser!.email,
         id: data!.docs.first.id);
+
 ///////////////////////////////////////////////////////////////////////77
     return SafeArea(
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.person),
-            onPressed: () {},
-          ),
-          title:
-              Center(child: Text('${data!.docs.first.data()['users'] ?? ""}')),
+          // title: buildTitle(),
+
+          // Center(child: Text('${data!.docs.first.data()['users'] ?? ""}')),
           actions: [
             IconButton(
               onPressed: () {
                 FirebaseAuth.instance.signOut();
 
-                userViewProvider.updateUsers(user, "", data!.docs.first.id);
+                // userViewProvider.updateUsers(user, "", data!.docs.first.id);
               },
               icon: Icon(Icons.logout),
             )
@@ -79,6 +82,7 @@ class _ChatroomPageState extends State<ChatroomPage> {
                     );
                   } else {
                     List<ChatRooms> chatRoomList = snapshot.data!;
+                    provider.setChatRooms(chatRoomList);
 
                     return Container(
                       child: ListView.builder(
@@ -86,6 +90,11 @@ class _ChatroomPageState extends State<ChatroomPage> {
                           itemCount: chatRoomList.length,
                           itemBuilder: (context, index) {
                             ChatRooms chatRooms = chatRoomList[index];
+                            var userLengthInChatroom = provider.usersList
+                                .where((element) =>
+                                    element.id != data!.docs.first.id &&
+                                    element.chatRoomId == chatRooms.id)
+                                .toList();
 
                             return Column(
                               children: [
@@ -103,16 +112,18 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) => ChatPage(
-                                                      chatRooms: chatRooms,
-                                                    )));
+                                                    chatRooms: chatRooms,
+                                                    meId: data!.docs.first.id,
+                                                    meName: data!.docs.first
+                                                        .data()['users'])));
 
                                         setState(() {
                                           selected = index;
                                           _visible = !_visible;
                                         });
 
-                                        userViewProvider.updateUsers(user,
-                                            chatRooms.id, data!.docs.first.id);
+                                        provider.updateUsers(user, chatRooms.id,
+                                            data!.docs.first.id);
 
                                         // Provider.of<ChatroomViewModel>(context,
                                         //         listen: false)
@@ -133,6 +144,21 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                             '${chatRooms.flagImage}',
                                           )),
                                           title: Text('${chatRooms.name}'),
+                                          trailing: Container(
+                                              height: 20,
+                                              width: 20,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                  color: Colors.green),
+                                              child: userLengthInChatroom
+                                                      .isNotEmpty
+                                                  ? Center(
+                                                      child: Center(
+                                                      child: Text(
+                                                          '${userLengthInChatroom.length}'),
+                                                    ))
+                                                  : Center(child: Text('0'))),
                                         ),
                                         decoration: BoxDecoration(
                                           color: selected == index
@@ -145,13 +171,11 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                     ),
                                   ),
                                 ),
-                                buildOnlineUsers(
-                                  index,
-                                  chatRooms,
-                                  context,
-                                  userViewProvider.usersList,
-                                  // chatroomViewModel
-                                ),
+                                buildOnlineUsers(index, chatRooms, context,
+                                    provider.usersList, userLengthInChatroom
+
+                                    // chatroomViewModel
+                                    ),
                               ],
                             );
                           }),
@@ -169,6 +193,7 @@ class _ChatroomPageState extends State<ChatroomPage> {
     ChatRooms chatRooms,
     BuildContext context,
     List<Users> userList,
+    List<Users> userLengthInChatroom,
     // ChatroomViewModel chatroomViewModel
   ) {
     return Visibility(
@@ -183,34 +208,49 @@ class _ChatroomPageState extends State<ChatroomPage> {
           /// _visible(false) ise butona tıklanmadan boş container döner. butonun içinde set state ile _visible =!_visible olduğu için butona tıklandığında true olur ve asıl alanı gösterir.
           ? Container(
               height: 200,
-              child: ListView(
-                  children: userList
-                      .where((element) =>
-                          element.id != data!.docs.first.id &&
-                          element.chatRoomId == chatRooms.id)
-                      .map((user) => GestureDetector(
-                            onDoubleTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Dm(
-                                          userId: user.id,
-                                          userName: user.users,
-                                          // user: user,
-                                        ))),
-                            child: ListTile(
-                              title: Text('${user.users}'),
-                              leading: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    shape: BoxShape.circle),
-                                width: 10,
-                                height: 10,
-                              ),
-                            ),
-                          ))
-                      .toList()),
+              child: userLengthInChatroom.isNotEmpty
+                  ? ListView(
+                      children: userList
+                          .where((element) =>
+                              element.id != data!.docs.first.id &&
+                              element.chatRoomId == chatRooms.id)
+                          .map((user) => GestureDetector(
+                                onDoubleTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Dm(
+                                              userId: user.id,
+                                              userName: user.users,
+                                              // user: user,
+                                            ))),
+                                child: ListTile(
+                                  title: Text('${user.users}'),
+                                  leading: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        shape: BoxShape.circle),
+                                    width: 10,
+                                    height: 10,
+                                  ),
+                                ),
+                              ))
+                          .toList())
+                  : Center(
+                      child: Text('There is no any online user'),
+                    ),
             )
           : Container(),
     );
   }
+
+  Widget buildTitle() => TitleWidget(
+        language1: language1,
+        language2: language2,
+        onChangedLanguage1: (newLanguage) => setState(() {
+          language1 = newLanguage!;
+        }),
+        onChangedLanguage2: (newLanguage) => setState(() {
+          language2 = newLanguage!;
+        }),
+      );
 }

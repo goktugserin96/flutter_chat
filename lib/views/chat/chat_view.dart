@@ -4,17 +4,25 @@ import 'package:flutter_android_app/models/chat.dart';
 import 'package:flutter_android_app/models/chat_rooms.dart';
 import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
+import 'package:translator/translator.dart';
 
 import '../../provider/app_provider.dart';
+import '../../utils/translations.dart';
+import '../../widgets/chat_messages_widget.dart';
+import '../../widgets/title_widget.dart';
 import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
 
 class ChatPage extends StatefulWidget {
   final ChatRooms chatRooms;
+  final String meId;
+  final String meName;
 
   const ChatPage({
     Key? key,
     required this.chatRooms,
+    required this.meId,
+    required this.meName,
 
     // required this.online
   }) : super(key: key);
@@ -26,6 +34,18 @@ class _ChatPageState extends State<ChatPage> {
   int charLength = 0;
 
   bool status = false;
+
+  String language1 = Translations.languages.first;
+  String language2 = Translations.languages.first;
+
+  var fromLanguage;
+
+  var toLanguage;
+
+  TextEditingController _controller = TextEditingController();
+
+  var translatedMessage;
+  var translator = GoogleTranslator();
 
   _onChanged(String value) {
     setState(() {
@@ -44,7 +64,6 @@ class _ChatPageState extends State<ChatPage> {
   }
 
 //
-  TextEditingController _controller = TextEditingController();
 
   @override
   void dispose() {
@@ -53,12 +72,46 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
+  void saveChatMessages() {
+    AppProvider provider = Provider.of<AppProvider>(context, listen: false);
+
+    var message = _controller.text;
+    final fromLanguageCode = Translations.getLanguageCode(fromLanguage);
+    final toLanguageCode = Translations.getLanguageCode(toLanguage);
+
+    setState(() {
+      translator
+          .translate(_controller.text,
+              from: fromLanguageCode, to: toLanguageCode)
+          .then((value) {
+        setState(() {
+          translatedMessage = value.text;
+          provider.createChat(ChatInfo(
+              chatroomId: widget.chatRooms.id,
+              senderUser: data!.docs.first.data()['users'] ?? "",
+              receiverUser: data!.docs.first.data()['users'] ?? "",
+              message: message,
+              translatedMessage: translatedMessage ?? "",
+              time: DateTime.now(),
+              userId: data!.docs.first.id));
+        });
+      });
+    });
+
+    status = false;
+    _controller.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     AppProvider appProvider = Provider.of<AppProvider>(context);
 
     return Scaffold(
         appBar: AppBar(
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(30),
+            child: buildTitle(),
+          ),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
@@ -66,7 +119,7 @@ class _ChatPageState extends State<ChatPage> {
             },
           ),
           centerTitle: true,
-          title: Text('${widget.chatRooms.name}'),
+          title: Text('${widget.chatRooms.name} Page'),
         ),
         body: Stack(
           children: [
@@ -80,10 +133,9 @@ class _ChatPageState extends State<ChatPage> {
                   } else if (!snapshot.hasData) {
                     return const Center(
                       child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(),
-                      ),
+                          width: 70,
+                          height: 70,
+                          child: CircularProgressIndicator()),
                     );
                   } else {
                     List<ChatInfo>? chatList = snapshot.data;
@@ -100,7 +152,15 @@ class _ChatPageState extends State<ChatPage> {
                                   itemBuilder: (context, index) {
                                     ChatInfo chat = chatList[index];
 
-                                    return buildChatArea(chat);
+                                    final isMe = chat.userId == widget.meId &&
+                                        chat.chatroomId == widget.chatRooms.id;
+
+                                    fromLanguage = isMe ? language1 : language2;
+                                    toLanguage = isMe ? language2 : language1;
+                                    return ChatMessages(
+                                      chat: chat,
+                                      isMe: isMe,
+                                    );
                                   }),
                             ),
                           ),
@@ -181,19 +241,7 @@ class _ChatPageState extends State<ChatPage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
                       onPressed: () {
-                        status = false;
-
-                        final newChat = ChatInfo(
-                            chatroomId: widget.chatRooms.id,
-                            senderUser: data!.docs.first.data()['users'] ?? "",
-                            receiverUser:
-                                data!.docs.first.data()['users'] ?? "",
-                            message: _controller.text,
-                            time: DateTime.now(),
-                            userId: data!.docs.first.id);
-                        chatViewModelProvider.createChat(newChat);
-
-                        _controller.clear();
+                        saveChatMessages();
                       },
                       child: Icon(Icons.send),
                     ),
@@ -204,4 +252,15 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
+  Widget buildTitle() => TitleWidget(
+        language1: language1,
+        language2: language2,
+        onChangedLanguage1: (newLanguage) => setState(() {
+          language1 = newLanguage!;
+        }),
+        onChangedLanguage2: (newLanguage) => setState(() {
+          language2 = newLanguage!;
+        }),
+      );
 }

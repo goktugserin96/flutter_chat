@@ -23,4 +23,28 @@ class ChatDatabase {
   //       .doc(ChatInfo.fromMap(chatAsMap).chatId)
   //       .set(chatAsMap);
   // }
+
+  static Future addChatInitial(List<ChatInfo> chats) async {
+    final refChat = FirebaseFirestore.instance.collection('chat');
+
+    final allChat = await refChat.get();
+    if (allChat.size != 0) {
+      return;
+    } else {
+      for (final chat in chats) {
+        final chatDoc = refChat.doc();
+        final newChat = chat.copyWith(
+            userId: chat.userId,
+            chatroomId: chat.chatroomId,
+            chatId: chat.chatId,
+            senderUser: chat.senderUser,
+            message: chat.message,
+            time: chat.time,
+            translatedMessage: chat.translatedMessage,
+            receiverUser: chat.receiverUser);
+
+        await chatDoc.set(newChat.toMap());
+      }
+    }
+  }
 }

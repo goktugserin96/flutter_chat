@@ -1,3 +1,4 @@
+import 'package:flutter_android_app/models/chat.dart';
 import 'package:flutter_android_app/models/chat_rooms.dart';
 
 // final String TR = "TR";
@@ -19,7 +20,7 @@ List<ChatRooms> chatroomsList = [
       flagImage:
           "https://www.istardanismanlik.com/media/haberResimleri/1730-1195-77122.jpg"),
   ChatRooms(
-      name: "Russia",
+      name: "Russian",
       flagImage:
           "https://media.istockphoto.com/photos/flag-of-russia-picture-id489481953?k=20&m=489481953&s=612x612&w=0&h=_fxq--gIkMUt4bnhujwK1LDd_hA8Wk1qu5XlGQntsgI="),
   ChatRooms(
@@ -27,9 +28,17 @@ List<ChatRooms> chatroomsList = [
       flagImage:
           "https://stuffedeyes.files.wordpress.com/2018/06/spain-2906824_960_720.png?w=640"),
   ChatRooms(
-      name: "Germany",
+      name: "German",
       flagImage:
           "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/2560px-Flag_of_Germany.svg.png")
+];
+
+List<ChatInfo> chatList = [
+  ChatInfo(
+      chatroomId: "",
+      message: "Service Message",
+      time: DateTime.now(),
+      userId: ""),
 ];
 
 // countries2.keys.map((e){

@@ -1,4 +1,3 @@
-import 'package:bubble/bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +6,11 @@ import 'package:flutter_android_app/provider/app_provider.dart';
 import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
 
+import '../../widgets/chat_messages_widget.dart';
 import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
+
+QuerySnapshot<Map<String, dynamic>>? chatData;
 
 class Dm extends StatefulWidget {
   // final Users user;
@@ -27,18 +29,44 @@ class Dm extends StatefulWidget {
   State<Dm> createState() => _DmState();
 }
 
+//
 class _DmState extends State<Dm> {
-  QuerySnapshot<Map<String, dynamic>>? chatData;
+  // void setStateIfMounted(f) {
+  //   if (mounted) setState(f);
+  // }
 
-  void getData() async {
-    await FirebaseFirestore.instance
-        .collection('chat')
-        .where('chatroomId', isEqualTo: widget.userId)
-        .where('userId', isEqualTo: data!.docs.first.id)
-        .get()
-        .then((value) => chatData = value);
+  void initState() {
+    getData();
+
+    super.initState();
   }
 
+  bool? isLoading;
+  void getData() async {
+    setState(() {
+      isLoading = true;
+    });
+    {
+      try {
+        await FirebaseFirestore.instance
+            .collection('chat')
+            .where('chatroomId', isEqualTo: widget.userId)
+            .where('userId', isEqualTo: data!.docs.first.id)
+            .get()
+            .then((value) {
+          setState(() {
+            chatData = value;
+          });
+        });
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+//
   int charLength = 0;
 
   bool status = false;
@@ -84,7 +112,7 @@ class _DmState extends State<Dm> {
               //     .deleteUser(widget.user);
 
               Navigator.pop(context);
-
+//
               // Navigator.push(context,
               //     MaterialPageRoute(builder: (context) => MyHomePage()));
             },
@@ -95,85 +123,92 @@ class _DmState extends State<Dm> {
         body: Stack(
           children: [
             BackgroundContainer,
-            StreamBuilder<List<ChatInfo>>(
-                stream: ChatViewModel.getPrivateChatList(
-                    data!.docs.first.id, widget.userId), //UserProvider[0].id
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    print('dfdfd${snapshot.data}');
-                    return Center(child: Text('${snapshot.error}'));
-                  } else if (!snapshot.hasData) {
-                    return const Center(
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  } else {
-                    List<ChatInfo>? chatList = snapshot.data;
-
-                    Provider.of<AppProvider>(context).setChats(chatList!);
-
-                    return Container(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              child: ListView.builder(
-                                  // shrinkWrap: true,
-                                  // physics: BouncingScrollPhysics(),
-                                  itemCount: chatList.length,
-                                  itemBuilder: (context, i) {
-                                    ChatInfo chat = chatList[i];
-                                    // Provider.of<AppProvider>(context)
-                                    //     .deneme(chat);
-
-                                    final isMe = chat.userId == widget.userId &&
-                                        chat.chatroomId == data!.docs.first.id;
-
-                                    final deneme1 =
-                                        chat.chatroomId == data!.docs.first.id;
-
-                                    final deneme2 =
-                                        chat.userId == widget.userId;
-
-                                    final deneme3 =
-                                        chat.chatroomId == widget.userId;
-
-                                    final deneme4 =
-                                        chat.userId == data!.docs.first.id;
-
-                                    return
-                                        // chatBuild(chat,isMe,deneme1,deneme2,deneme3,deneme4)
-                                        //
-                                        //
-                                        // (deneme1 && deneme2) ||
-                                        //       (deneme3 && deneme4)
-                                        //   ? DmChatWidget(isMe: isMe, chat: chat)
-                                        //   : Container();
-
-                                        buildChatArea(chat, isMe, deneme1,
-                                            deneme2, deneme3, deneme4);
-                                  }),
-                            ),
+            isLoading == true
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : StreamBuilder<List<ChatInfo>>(
+                    stream: ChatViewModel.getPrivateChatList(
+                        data!.docs.first.id,
+                        widget.userId), //UserProvider[0].id
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        print('dfdfd${snapshot.data}');
+                        return Center(child: Text('${snapshot.error}'));
+                      } else if (!snapshot.hasData) {
+                        return const Center(
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: CircularProgressIndicator(),
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color.fromARGB(255, 18, 32, 47),
-                                  // shadow direction: bottom right
-                                )
-                              ],
-                            ),
-                            child: buildTextField(appProvider, chatList),
+                        );
+                      } else {
+                        List<ChatInfo>? chatList = snapshot.data;
+
+                        Provider.of<AppProvider>(context).setChats(chatList!);
+
+                        return Container(
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  child: ListView.builder(
+                                      // shrinkWrap: true,
+                                      // physics: BouncingScrollPhysics(),
+                                      itemCount: chatList.length,
+                                      itemBuilder: (context, i) {
+                                        ChatInfo chat = chatList[i];
+                                        // Provider.of<AppProvider>(context)
+                                        //     .deneme(chat);
+
+                                        final isMe =
+                                            chat.userId == widget.userId &&
+                                                chat.chatroomId ==
+                                                    data!.docs.first.id;
+
+                                        final deneme1 = chat.chatroomId ==
+                                            data!.docs.first.id;
+
+                                        final deneme2 =
+                                            chat.userId == widget.userId;
+
+                                        final deneme3 =
+                                            chat.chatroomId == widget.userId;
+
+                                        final deneme4 =
+                                            chat.userId == data!.docs.first.id;
+//
+                                        return
+                                            // chatBuild(chat,isMe,deneme1,deneme2,deneme3,deneme4)
+                                            //
+                                            //
+                                            // (deneme1 && deneme2) ||
+                                            //       (deneme3 && deneme4)
+                                            //   ? DmChatWidget(isMe: isMe, chat: chat)
+                                            //   : Container();
+
+                                            buildChatArea(chat, isMe, deneme1,
+                                                deneme2, deneme3, deneme4);
+                                      }),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromARGB(255, 18, 32, 47),
+                                      // shadow direction: bottom right
+                                    )
+                                  ],
+                                ),
+                                child: buildTextField(appProvider, chatList),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }
-                }),
+                        );
+                      }
+                    }),
           ],
         ));
   }
@@ -181,20 +216,14 @@ class _DmState extends State<Dm> {
   Widget buildChatArea(
       ChatInfo chat, bool isMe, bool deneme1, bool deneme2, deneme3, deneme4) {
     return (deneme1 && deneme2) || (deneme3 && deneme4)
-        ? Bubble(
-            margin: const BubbleEdges.only(top: 10),
-            alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-            nipWidth: 6,
-            nipHeight: 5,
-            nip: isMe ? BubbleNip.rightTop : BubbleNip.leftTop,
-            color: isMe ? Colors.green : Colors.amberAccent,
-            child: Text(
-              '${chat.message}',
-            ),
+        ? ChatMessages(
+            chat: chat,
+            isMe: isMe,
           )
         : Container();
   }
 
+//
   Widget buildTextField(
       AppProvider ChatViewModelProvider, List<ChatInfo> chatList) {
     return Card(
@@ -244,12 +273,13 @@ class _DmState extends State<Dm> {
                         ///
                         ///
                         final newChat = ChatInfo(
-                            chatroomId: data!.docs.first.id,
-                            senderUser: data!.docs.first.data()['users'] ?? "",
-                            receiverUser: widget.userName,
-                            message: _controller.text,
-                            time: DateTime.now(),
-                            userId: widget.userId);
+                          chatroomId: data!.docs.first.id,
+                          senderUser: data!.docs.first.data()['users'] ?? "",
+                          receiverUser: widget.userName,
+                          message: _controller.text,
+                          time: DateTime.now(),
+                          userId: widget.userId,
+                        );
                         ChatViewModelProvider.createChat(newChat);
 
                         // ChatViewModelProvider.updateUsersIsOnline(

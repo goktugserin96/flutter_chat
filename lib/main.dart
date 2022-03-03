@@ -29,6 +29,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await ChatroomDatabase.addChatRoomsCountries(chatroomsList);
+  // await ChatDatabase.addChatInitial(chatList);
   runApp(MyApp());
 }
 
@@ -53,7 +54,6 @@ class MyApp extends StatelessWidget {
         scaffoldMessengerKey: Utils.scaffoldMessengerKey,
         navigatorKey: navigatorKey,
         theme: ThemeData.dark(),
-        //.copyWith(scaffoldBackgroundColor: darkBlue),
         home:
             //ExitPage()
             MyHomePageAuth(),

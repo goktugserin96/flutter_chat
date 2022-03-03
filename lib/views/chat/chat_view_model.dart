@@ -1,18 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_android_app/models/chat.dart';
-import 'package:flutter_android_app/services/chat_database.dart';
 
 class ChatViewModel {
   ///bookview'ın state bilgilerini tutmak
   ///bookview arayzünün ihtiyacı olan metodları hesaplamaları yapmak
   ///gerekli servislerle konuşmak
-  String _collectionPath = 'chat';
-  ChatDatabase _database = ChatDatabase();
 
   static Stream<List<ChatInfo>> getChatList(String chatroomId) =>
       FirebaseFirestore.instance
           .collection('chat')
           .where('chatroomId', isEqualTo: chatroomId)
+          .orderBy(ChatInfoField.time, descending: false)
           .snapshots()
           .map((snapshot) => snapshot.docs
               .map((doc) => ChatInfo.fromMap(doc.data()))
@@ -37,6 +35,7 @@ class ChatViewModel {
       senderUser: chat.senderUser,
       receiverUser: chat.receiverUser,
       message: chat.message,
+      translatedMessage: chat.translatedMessage,
       time: DateTime.now(),
       chatroomId: chat.chatroomId,
       userId: chat.userId,

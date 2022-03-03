@@ -2,22 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_android_app/provider/app_provider.dart';
 import 'package:flutter_android_app/views/chat/dm.dart';
 import 'package:flutter_android_app/views/nickname/nickname_view.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/chat.dart';
 import '../screens/screens_page_view.dart';
 
 QuerySnapshot<Map<String, dynamic>>? dataChat;
 
-class OnlineUsers extends StatefulWidget {
+class DmMessages extends StatefulWidget {
   @override
-  State<OnlineUsers> createState() => _OnlineUsersState();
+  State<DmMessages> createState() => _DmMessagesState();
 }
 
-class _OnlineUsersState extends State<OnlineUsers> {
+class _DmMessagesState extends State<DmMessages> {
   void initState() {
     getData();
 
@@ -25,6 +23,7 @@ class _OnlineUsersState extends State<OnlineUsers> {
   }
 
   bool isLoading = true;
+  bool isSeen = false;
   void getData() async {
     await FirebaseFirestore.instance
         .collection("chat")
@@ -40,19 +39,16 @@ class _OnlineUsersState extends State<OnlineUsers> {
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = Provider.of<AppProvider>(context).usersList;
-
-    // var name = userProvider.map((e) => e.users).toString();
-    // var id = userProvider.map((e) => e.id).toString();
-    // print('dd $dd');
-
     final seen = Set<String>();
+
     var mix = dataChat!.docs
-        .where((element) => element.data()['chatroomId'] == data!.docs.first.id
-            ? seen.add(element.data()['receiverUser'])
-            : element.data()['userId'] == data!.docs.first.id
-                ? seen.add(element.data()['senderUser'])
-                : false)
+        .where((element) =>
+            element.data()['chatroomId'] == data!.docs.first.id ||
+                    element.data()['chatroomId'] == element.data()['senderId']
+                ? seen.add(element.data()['receiverUser'])
+                : element.data()['userId'] == data!.docs.first.id
+                    ? seen.add(element.data()['senderUser'])
+                    : false)
         .toList();
 
     return Scaffold(
@@ -74,64 +70,41 @@ class _OnlineUsersState extends State<OnlineUsers> {
         ),
         body: Stack(children: [
           BackgroundContainer,
-          ListView.builder(
-            itemCount: mix.length,
-            itemBuilder: (context, index) {
-              var chat = mix[index];
+          mix.isEmpty
+              ? Center(
+                  child: Text('There is No Message'),
+                )
+              : ListView.builder(
+                  itemCount: mix.length,
+                  itemBuilder: (context, index) {
+                    var chat = mix[index];
 
-              var query1 = chat.data()['chatroomId'] == data!.docs.first.id;
-              var query2 = chat.data()['userId'] == data!.docs.first.id;
-              return messageList(context, chat, query1, query2);
-            },
-          )
-        ]
-            // children: dataChat!.docs
-            //     .where((element) =>
-            //         element.data()['userId'] == data!.docs.first.id ||
-            //         element.data()['chatroomId'] == data!.docs.first.id)
-            //     .where((element) =>
-            //         seen.add(element.data()['receiverUser']) ||
-            //         seen.add(element.data()['senderUser']))
-            //     .map((e) {
+                    var query1 =
+                        chat.data()['chatroomId'] == data!.docs.first.id;
+                    var query2 = chat.data()['userId'] == data!.docs.first.id;
+                    var isChatroom = chat.data()['senderUser'] !=
+                        chat.data()['receiverUser'];
 
-            // }).toList()
-
-            // print('ssssssss ${dataChat!.docs[index].data()["senderUser"]}');
-
-            // print('ssssssss ${dataChat!.docs[index].data()["receiverUser"]}');
-            // print('receiver ${users.receiverUser}');
-            // print('---------------');
-            // print('sender ${users.senderUser}');
-            // print('---------------');
-
-            //     children: unique
-            //         // .where((chats) =>
-            //         //     chats.userId == data!.docs.first.id ||
-            //         //     chats.chatroomId == data!.docs.first.id)
-            //         // .where((element) =>
-            //         //     element.receiverUser == element.receiverUser ||
-            //         //     element.senderUser == element.senderUser)
-            //         // .toSet()
-            //         // .toList()
-            //         .map(
-            //   (users) {
-            //     return
-            //     // : Container();
-            //   },
-            // ).toList()
-
-            ));
+                    return messageList(
+                        context, chat, query1, query2, isChatroom);
+                  },
+                )
+        ]));
   }
 
   Padding messageList(
       BuildContext context,
       QueryDocumentSnapshot<Map<String, dynamic>> chat,
       bool query1,
-      bool query2) {
+      bool query2,
+      bool isChatroom) {
     return Padding(
       padding: const EdgeInsets.all(1.0),
       child: GestureDetector(
         onTap: () {
+          setState(() {
+            isSeen = true;
+          });
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -147,28 +120,26 @@ class _OnlineUsersState extends State<OnlineUsers> {
         //
         // : null,
         child: Container(
-          color: Colors.white54.withOpacity(0.2),
-          child: ListTile(
-            trailing: query2
-                ? CircleAvatar(
-                    backgroundColor: Colors.green,
-                    radius: 5,
-                  )
-                : null,
-            leading: Container(
-              decoration:
-                  BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-              width: 10,
-              height: 10,
-            ),
-            title: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 15, 15),
-                child: query1
-                    ? Text('${chat.data()['receiverUser']}')
-                    : Text('${chat.data()['senderUser']}')),
-            subtitle: Text('${chat.data()['message']}'),
-          ),
-        ),
+            color: Colors.white54.withOpacity(0.2),
+            child: isChatroom
+                ? ListTile(
+                    trailing: query2
+                        ? CircleAvatar(
+                            child: Text(
+                              "${chat.data().length}",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Colors.green,
+                            radius: 10,
+                          )
+                        : null,
+                    title: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 15, 15),
+                        child: query1 & isChatroom
+                            ? Text('${chat.data()['receiverUser']}')
+                            : Text('${chat.data()['senderUser']}')),
+                    subtitle: Text('${chat.data()['message']}'))
+                : null),
       ),
     );
   }

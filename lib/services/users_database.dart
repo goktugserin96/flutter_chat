@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_android_app/models/users.dart';
 
 class UsersDatabase {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -14,12 +13,4 @@ class UsersDatabase {
 
 //   }
 
-  // Future<void> setUserData(
-  //     {required String collectionPath,
-  //     required Map<String, dynamic> usersAsMap}) async {
-  //   await _firestore
-  //       .collection(collectionPath)
-  //       .doc(Users.fromMap(usersAsMap).id)
-  //       .set(usersAsMap);
-  // }
 }

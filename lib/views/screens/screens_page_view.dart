@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/views/chat_rooms/chatroom_view.dart';
-import 'package:flutter_android_app/views/users/online_users.dart';
+import 'package:flutter_android_app/views/users/dm_messages.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/users.dart';
@@ -26,23 +26,29 @@ class _ScreensPageState extends State<ScreensPage> {
   void initState() {
     getData();
 
-    // updateOnlineUsers();
-
     super.initState();
   }
 
-  bool isLoading = true;
+  bool? isLoading;
   void getData() async {
-    await FirebaseFirestore.instance
-        .collection("users")
-        .where("email", isEqualTo: widget.mail)
-        .get()
-        .then((value) {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .where("email", isEqualTo: widget.mail)
+          .get()
+          .then((value) {
+        setState(() {
+          data = value;
+        });
+      });
+    } finally {
       setState(() {
-        data = value;
         isLoading = false;
       });
-    });
+    }
   }
 
   int selectedIndex = 0;
@@ -52,8 +58,10 @@ class _ScreensPageState extends State<ScreensPage> {
   Widget build(BuildContext context) {
     List<Widget> tabs = [
       ChatroomPage(),
-      OnlineUsers(),
+      DmMessages(),
     ];
+
+    print('loading $isLoading');
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.white.withOpacity(0.7), //saydamlaştırma
@@ -71,12 +79,12 @@ class _ScreensPageState extends State<ScreensPage> {
             label: 'Chatrooms',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_alt_sharp),
-            label: 'Friends',
+            icon: Icon(Icons.message),
+            label: 'Messages',
           )
         ],
       ),
-      body: isLoading
+      body: isLoading == true
           ? Center(
               child: CircularProgressIndicator(),
             )

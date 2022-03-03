@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_android_app/models/chat.dart';
+import 'package:flutter_android_app/models/chat_rooms.dart';
 import 'package:flutter_android_app/views/users/users_view_model.dart';
 
 import '../models/users.dart';
@@ -17,6 +18,9 @@ class AppProvider extends ChangeNotifier {
 
   List<ChatInfo> get chatList => _chatList;
 
+  List<ChatRooms> _chatRoomList = [];
+
+  List<ChatRooms> get chatRoomList => _chatRoomList;
   // void createUser(Users user) => UserViewModel.addNewUser(users: user);
   //
   // void addChat(ChatInfo chat) {
@@ -37,6 +41,13 @@ class AppProvider extends ChangeNotifier {
   void setChats(List<ChatInfo> chats) {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       _chatList = chats;
+      notifyListeners();
+    });
+  }
+
+  void setChatRooms(List<ChatRooms> chatrooms) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _chatRoomList = chatrooms;
       notifyListeners();
     });
   }
