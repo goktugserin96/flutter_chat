@@ -70,7 +70,7 @@ class _DmMessagesState extends State<DmMessages> {
         ),
         body: Stack(children: [
           BackgroundContainer,
-          mix.isEmpty
+          dataChat!.docs.isEmpty
               ? Center(
                   child: Text('There is No Message'),
                 )

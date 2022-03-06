@@ -32,19 +32,14 @@ class _ChatroomPageState extends State<ChatroomPage> {
 
   @override
   Widget build(BuildContext context) {
-    // deneme();
-
     ///users
     AppProvider provider = Provider.of<AppProvider>(context);
 
-    // ChatroomViewModel chatroomViewModel =
-    //     Provider.of<ChatroomViewModel>(context);
     var user = Users(
         users: data!.docs.first.data()['users'],
         email: FirebaseAuth.instance.currentUser!.email,
         id: data!.docs.first.id);
 
-///////////////////////////////////////////////////////////////////////77
     return SafeArea(
       child: Scaffold(
         extendBodyBehindAppBar: true,
@@ -77,7 +72,7 @@ class _ChatroomPageState extends State<ChatroomPage> {
                       child: SizedBox(
                         width: 50,
                         height: 50,
-                        child: CircularProgressIndicator(),
+                        child: Text('there  is no chatroom'),
                       ),
                     );
                   } else {

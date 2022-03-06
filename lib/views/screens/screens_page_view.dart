@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/views/chat_rooms/chatroom_view.dart';
@@ -29,26 +30,19 @@ class _ScreensPageState extends State<ScreensPage> {
     super.initState();
   }
 
-  bool? isLoading;
+  bool isLoading = true;
   void getData() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      await FirebaseFirestore.instance
-          .collection("users")
-          .where("email", isEqualTo: widget.mail)
-          .get()
-          .then((value) {
-        setState(() {
-          data = value;
-        });
-      });
-    } finally {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .where("email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .get()
+        .then((value) {
+      if (!mounted) return;
       setState(() {
+        data = value;
         isLoading = false;
       });
-    }
+    });
   }
 
   int selectedIndex = 0;
@@ -84,32 +78,28 @@ class _ScreensPageState extends State<ScreensPage> {
           )
         ],
       ),
-      body: isLoading == true
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : StreamBuilder<List<Users>>(
-              stream: UserViewModel.getUsersList(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  print('dfdfd${snapshot.data}');
-                  return Center(child: Text('${snapshot.error}'));
-                } else if (!snapshot.hasData) {
-                  return const Center(
-                    child: SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                } else {
-                  List<Users> userList = snapshot.data!;
+      body: StreamBuilder<List<Users>>(
+        stream: UserViewModel.getUsersList(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print('dfdfd${snapshot.data}');
+            return Center(child: Text('${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return const Center(
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: Text("asdas"),
+              ),
+            );
+          } else {
+            List<Users> userList = snapshot.data!;
 
-                  Provider.of<AppProvider>(context).setUsers(userList);
-                  return tabs[selectedIndex];
-                }
-              },
-            ),
+            Provider.of<AppProvider>(context).setUsers(userList);
+            return tabs[selectedIndex];
+          }
+        },
+      ),
     );
   }
 }

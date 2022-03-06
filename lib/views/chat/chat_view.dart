@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/models/chat.dart';
 import 'package:flutter_android_app/models/chat_rooms.dart';
-import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
 import 'package:translator/translator.dart';
 
@@ -76,6 +75,8 @@ class _ChatPageState extends State<ChatPage> {
     AppProvider provider = Provider.of<AppProvider>(context, listen: false);
 
     var message = _controller.text;
+    print('fromlanguage $fromLanguage');
+    print('toLanguage $toLanguage');
     final fromLanguageCode = Translations.getLanguageCode(fromLanguage);
     final toLanguageCode = Translations.getLanguageCode(toLanguage);
 
@@ -104,7 +105,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    AppProvider appProvider = Provider.of<AppProvider>(context);
+    // AppProvider appProvider = Provider.of<AppProvider>(context);
 
     return Scaffold(
         appBar: AppBar(
@@ -121,86 +122,72 @@ class _ChatPageState extends State<ChatPage> {
           centerTitle: true,
           title: Text('${widget.chatRooms.name} Page'),
         ),
-        body: Stack(
-          children: [
-            BackgroundContainer,
-            StreamBuilder<List<ChatInfo>>(
-                stream: ChatViewModel.getChatList(widget.chatRooms.id),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    print('dfdfd${snapshot.data}');
-                    return Center(child: Text('${snapshot.error}'));
-                  } else if (!snapshot.hasData) {
-                    return const Center(
-                      child: SizedBox(
-                          width: 70,
-                          height: 70,
-                          child: CircularProgressIndicator()),
-                    );
-                  } else {
-                    List<ChatInfo>? chatList = snapshot.data;
+        body: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StreamBuilder<List<ChatInfo>>(
+                  stream: ChatViewModel.getChatList(widget.chatRooms.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      print('dfdfd${snapshot.data}');
+                      return Center(child: Text('${snapshot.error}'));
+                    } else if (!snapshot.hasData) {
+                      return const Center(
+                        child: SizedBox(
+                            width: 70,
+                            height: 70,
+                            child: Text("There is no message")),
+                      );
+                    } else {
+                      List<ChatInfo>? chatList = snapshot.data;
 
-                    return Container(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              child: ListView.builder(
-                                  // shrinkWrap: true,
-                                  // physics: BouncingScrollPhysics(),
-                                  itemCount: chatList!.length,
-                                  itemBuilder: (context, index) {
-                                    ChatInfo chat = chatList[index];
+                      return Expanded(
+                        child: Container(
+                          child: ListView.builder(
+                              itemCount: chatList!.length,
+                              itemBuilder: (context, index) {
+                                ChatInfo chat = chatList[index];
 
-                                    final isMe = chat.userId == widget.meId &&
-                                        chat.chatroomId == widget.chatRooms.id;
+                                final isMe = chat.userId == widget.meId &&
+                                    chat.chatroomId == widget.chatRooms.id;
 
-                                    fromLanguage = isMe ? language1 : language2;
-                                    toLanguage = isMe ? language2 : language1;
-                                    return ChatMessages(
-                                      chat: chat,
-                                      isMe: isMe,
-                                    );
-                                  }),
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color.fromARGB(255, 18, 32, 47),
-                                  // shadow direction: bottom right
-                                )
-                              ],
-                            ),
-                            child: buildTextField(appProvider),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                }),
-          ],
-        ));
+                                fromLanguage = isMe ? language1 : language2;
+                                toLanguage = isMe ? language2 : language1;
+                                return ChatMessages(
+                                  chat: chat,
+                                  isMe: isMe,
+                                );
+                              }),
+                        ),
+                      );
+                    }
+                  }),
+              buildTextField()
+            ]));
+    // Container(
+    //   decoration: BoxDecoration(
+    //     boxShadow: [
+    //       BoxShadow(
+    //         color: Color.fromARGB(255, 18, 32, 47),
+    //         // shadow direction: bottom right
+    //       )
+    //     ],
+    //   ),
+    //   child: buildTextField(),
+    // ),
+    //         ],
+    //       ),
+    //     );
+    //   }
+    // }),
+
+    // buildTextField(appProvider),
+    //     ],
+    //   ),
+    // );
   }
 
-  Card buildChatArea(ChatInfo chat) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      color: Colors.deepPurpleAccent,
-      child: ListTile(
-        leading: Text('${chat.senderUser}:'),
-        title: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 7),
-          child: Text('${chat.message}'),
-        ),
-      ),
-    );
-  }
-
-  Widget buildTextField(
-    AppProvider chatViewModelProvider,
-  ) {
+  Widget buildTextField() {
     return Card(
       child: Row(
         children: [
