@@ -87,10 +87,7 @@ class _ScreensPageState extends State<ScreensPage> {
           } else if (!snapshot.hasData) {
             return const Center(
               child: SizedBox(
-                width: 50,
-                height: 50,
-                child: Text("asdas"),
-              ),
+                  width: 50, height: 50, child: CircularProgressIndicator()),
             );
           } else {
             List<Users> userList = snapshot.data!;

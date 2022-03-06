@@ -35,18 +35,10 @@ class _ChatroomPageState extends State<ChatroomPage> {
     ///users
     AppProvider provider = Provider.of<AppProvider>(context);
 
-    var user = Users(
-        users: data!.docs.first.data()['users'],
-        email: FirebaseAuth.instance.currentUser!.email,
-        id: data!.docs.first.id);
-
     return SafeArea(
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          // title: buildTitle(),
-
-          // Center(child: Text('${data!.docs.first.data()['users'] ?? ""}')),
           actions: [
             IconButton(
               onPressed: () {
@@ -72,7 +64,7 @@ class _ChatroomPageState extends State<ChatroomPage> {
                       child: SizedBox(
                         width: 50,
                         height: 50,
-                        child: Text('there  is no chatroom'),
+                        child: CircularProgressIndicator(),
                       ),
                     );
                   } else {
@@ -103,6 +95,14 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                     width: double.infinity,
                                     child: GestureDetector(
                                       onDoubleTap: () {
+                                        // ChatInfo newChat = ChatInfo(
+                                        //     chatroomId: chatRooms.id,
+                                        //     message: chatRooms.name,
+                                        //     time: DateTime.now(),
+                                        //     userId: chatRooms.id);
+                                        //
+                                        // provider.createChat(newChat);
+
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -117,7 +117,14 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                           _visible = !_visible;
                                         });
 
-                                        provider.updateUsers(user, chatRooms.id,
+                                        provider.updateUsers(
+                                            Users(
+                                                users: data!.docs.first
+                                                    .data()['users'],
+                                                email: FirebaseAuth.instance
+                                                    .currentUser!.email,
+                                                id: data!.docs.first.id),
+                                            chatRooms.id,
                                             data!.docs.first.id);
 
                                         // Provider.of<ChatroomViewModel>(context,

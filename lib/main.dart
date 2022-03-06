@@ -14,7 +14,6 @@ import 'auth/util/utils.dart';
 import 'data.dart';
 
 // const Color darkBlue = Color.fromARGB(255, 18, 32, 47);
-const AssetImage assetImage = AssetImage("assets/images/background.png");
 
 User? myData;
 Future<void> main() async {

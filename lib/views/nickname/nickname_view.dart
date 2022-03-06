@@ -92,7 +92,7 @@
 //
 import 'package:flutter/cupertino.dart';
 
-import '../../main.dart';
+const AssetImage assetImage = AssetImage("assets/images/background.png");
 
 Widget BackgroundContainer = Container(
   decoration: BoxDecoration(

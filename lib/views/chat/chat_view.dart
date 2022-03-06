@@ -9,6 +9,7 @@ import '../../provider/app_provider.dart';
 import '../../utils/translations.dart';
 import '../../widgets/chat_messages_widget.dart';
 import '../../widgets/title_widget.dart';
+import '../nickname/nickname_view.dart';
 import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
 
@@ -37,10 +38,11 @@ class _ChatPageState extends State<ChatPage> {
   String language1 = Translations.languages.first;
   String language2 = Translations.languages.first;
 
-  var fromLanguage;
+  String fromLanguage = "";
 
-  var toLanguage;
+  String toLanguage = "";
 
+  bool isMe = false;
   TextEditingController _controller = TextEditingController();
 
   var translatedMessage;
@@ -61,8 +63,6 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
   }
-
-//
 
   @override
   void dispose() {
@@ -125,6 +125,7 @@ class _ChatPageState extends State<ChatPage> {
         body: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              BackgroundContainer,
               StreamBuilder<List<ChatInfo>>(
                   stream: ChatViewModel.getChatList(widget.chatRooms.id),
                   builder: (context, snapshot) {
@@ -132,12 +133,7 @@ class _ChatPageState extends State<ChatPage> {
                       print('dfdfd${snapshot.data}');
                       return Center(child: Text('${snapshot.error}'));
                     } else if (!snapshot.hasData) {
-                      return const Center(
-                        child: SizedBox(
-                            width: 70,
-                            height: 70,
-                            child: Text("There is no message")),
-                      );
+                      return Container();
                     } else {
                       List<ChatInfo>? chatList = snapshot.data;
 
@@ -148,11 +144,9 @@ class _ChatPageState extends State<ChatPage> {
                               itemBuilder: (context, index) {
                                 ChatInfo chat = chatList[index];
 
-                                final isMe = chat.userId == widget.meId &&
+                                isMe = chat.userId == widget.meId &&
                                     chat.chatroomId == widget.chatRooms.id;
 
-                                fromLanguage = isMe ? language1 : language2;
-                                toLanguage = isMe ? language2 : language1;
                                 return ChatMessages(
                                   chat: chat,
                                   isMe: isMe,
@@ -164,27 +158,6 @@ class _ChatPageState extends State<ChatPage> {
                   }),
               buildTextField()
             ]));
-    // Container(
-    //   decoration: BoxDecoration(
-    //     boxShadow: [
-    //       BoxShadow(
-    //         color: Color.fromARGB(255, 18, 32, 47),
-    //         // shadow direction: bottom right
-    //       )
-    //     ],
-    //   ),
-    //   child: buildTextField(),
-    // ),
-    //         ],
-    //       ),
-    //     );
-    //   }
-    // }),
-
-    // buildTextField(appProvider),
-    //     ],
-    //   ),
-    // );
   }
 
   Widget buildTextField() {
@@ -228,6 +201,11 @@ class _ChatPageState extends State<ChatPage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
                       onPressed: () {
+                        setState(() {
+                          fromLanguage = isMe ? language1 : language2;
+                          toLanguage = isMe ? language2 : language1;
+                        });
+
                         saveChatMessages();
                       },
                       child: Icon(Icons.send),
