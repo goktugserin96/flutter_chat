@@ -75,12 +75,13 @@ class _ChatPageState extends State<ChatPage> {
     AppProvider provider = Provider.of<AppProvider>(context, listen: false);
 
     var message = _controller.text;
-    print('fromlanguage $fromLanguage');
-    print('toLanguage $toLanguage');
-    final fromLanguageCode = Translations.getLanguageCode(fromLanguage);
-    final toLanguageCode = Translations.getLanguageCode(toLanguage);
 
     setState(() {
+      final fromLanguageCode = Translations.getLanguageCode(fromLanguage);
+      final toLanguageCode = Translations.getLanguageCode(toLanguage);
+      print('fromlanguage $fromLanguage');
+      print('toLanguage $toLanguage');
+
       translator
           .translate(_controller.text,
               from: fromLanguageCode, to: toLanguageCode)
@@ -203,10 +204,10 @@ class _ChatPageState extends State<ChatPage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
                       onPressed: () {
-                        // setState(() {
-                        //   // fromLanguage = isMe ? language1 : language2;
-                        //   // toLanguage = isMe ? language2 : language1;
-                        // });
+                        setState(() {
+                          fromLanguage = isMe ? language1 : language2;
+                          toLanguage = isMe ? language2 : language1;
+                        });
 
                         saveChatMessages();
                       },

@@ -95,14 +95,6 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                     width: double.infinity,
                                     child: GestureDetector(
                                       onDoubleTap: () {
-                                        // ChatInfo newChat = ChatInfo(
-                                        //     chatroomId: chatRooms.id,
-                                        //     message: chatRooms.name,
-                                        //     time: DateTime.now(),
-                                        //     userId: chatRooms.id);
-                                        //
-                                        // provider.createChat(newChat);
-
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -126,12 +118,6 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                                 id: data!.docs.first.id),
                                             chatRooms.id,
                                             data!.docs.first.id);
-
-                                        // Provider.of<ChatroomViewModel>(context,
-                                        //         listen: false)
-                                        //     .addNewChatroomUsers(
-                                        //         chatRoomsName: chatRooms.name,
-                                        //         chatRooms: chatRooms);
                                       },
                                       onTap: () {
                                         setState(() {

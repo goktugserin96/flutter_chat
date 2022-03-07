@@ -5,9 +5,12 @@ import 'package:flutter_android_app/models/chat.dart';
 import 'package:flutter_android_app/provider/app_provider.dart';
 import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
+import 'package:translator/translator.dart';
 
 import '../../data.dart';
+import '../../utils/translations.dart';
 import '../../widgets/chat_messages_widget.dart';
+import '../../widgets/title_widget.dart';
 import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
 
@@ -30,19 +33,57 @@ class Dm extends StatefulWidget {
   State<Dm> createState() => _DmState();
 }
 
-//
 class _DmState extends State<Dm> {
-  // void setStateIfMounted(f) {
-  //   if (mounted) setState(f);
-  // }
-
   void initState() {
     getData();
 
     super.initState();
   }
 
-  // bool isMe = false;
+  String language1 = Translations.languages.first;
+  String language2 = Translations.languages.first;
+
+  String fromLanguage = "";
+
+  String toLanguage = "";
+  bool isMe = false;
+
+  var translatedMessage;
+  var translator = GoogleTranslator();
+
+  void saveChatMessages() {
+    AppProvider provider = Provider.of<AppProvider>(context, listen: false);
+
+    var message = _controller.text;
+
+    setState(() {
+      final fromLanguageCode = Translations.getLanguageCode(fromLanguage);
+      final toLanguageCode = Translations.getLanguageCode(toLanguage);
+      print('fromlanguage $fromLanguage');
+      print('toLanguage $toLanguage');
+
+      translator
+          .translate(_controller.text,
+              from: fromLanguageCode, to: toLanguageCode)
+          .then((value) {
+        setState(() {
+          translatedMessage = value.text;
+          provider.createChat(ChatInfo(
+            chatroomId: data!.docs.first.id,
+            senderUser: data!.docs.first.data()['users'] ?? "",
+            receiverUser: widget.userName,
+            message: message,
+            translatedMessage: translatedMessage ?? "",
+            time: DateTime.now(),
+            userId: widget.userId,
+          ));
+        });
+      });
+    });
+
+    status = false;
+    _controller.clear();
+  }
 
   bool isLoading = false;
   void getData() async {
@@ -63,48 +104,6 @@ class _DmState extends State<Dm> {
   int charLength = 0;
 
   bool status = false;
-
-  // String language1 = Translations.languages.first;
-  // String language2 = Translations.languages.first;
-  //
-  // String fromLanguage = "";
-  //
-  // String toLanguage = "";
-  //
-  // var translatedMessage;
-  // var translator = GoogleTranslator();
-
-  // void saveChatMessages() {
-  //   AppProvider provider = Provider.of<AppProvider>(context, listen: false);
-  //
-  //   var message = _controller.text;
-  //   print('fromlanguage $fromLanguage');
-  //   print('toLanguage $toLanguage');
-  //   final fromLanguageCode = Translations.getLanguageCode(fromLanguage);
-  //   final toLanguageCode = Translations.getLanguageCode(toLanguage);
-  //
-  //   setState(() {
-  //     translator
-  //         .translate(_controller.text,
-  //             from: fromLanguageCode, to: toLanguageCode)
-  //         .then((value) {
-  //       setState(() {
-  //         translatedMessage = value.text;
-  //         provider.createChat(ChatInfo(
-  //           chatroomId: data!.docs.first.id,
-  //           senderUser: data!.docs.first.data()['users'] ?? "",
-  //           receiverUser: widget.userName,
-  //           message: _controller.text,
-  //           time: DateTime.now(),
-  //           userId: widget.userId,
-  //         ));
-  //       });
-  //     });
-  //   });
-  //
-  //   status = false;
-  //   _controller.clear();
-  // }
 
   _onChanged(String value) {
     setState(() {
@@ -140,10 +139,10 @@ class _DmState extends State<Dm> {
 
     return Scaffold(
         appBar: AppBar(
-          // bottom: PreferredSize(
-          //   preferredSize: Size.fromHeight(30),
-          //   child: buildTitle(),
-          // ),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(30),
+            child: buildTitle(),
+          ),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
@@ -181,7 +180,7 @@ class _DmState extends State<Dm> {
                                 itemBuilder: (context, i) {
                                   ChatInfo chat = chatList[i];
 
-                                  final isMe = chat.userId == widget.userId &&
+                                  isMe = chat.userId == widget.userId &&
                                       chat.chatroomId == data!.docs.first.id;
 
                                   final deneme1 =
@@ -262,29 +261,29 @@ class _DmState extends State<Dm> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
                       onPressed: () {
-                        status = false;
+                        // status = false;
 
-                        final newChat = ChatInfo(
-                          chatroomId: data!.docs.first.id,
-                          senderUser: data!.docs.first.data()['users'] ?? "",
-                          receiverUser: widget.userName,
-                          message: _controller.text,
-                          time: DateTime.now(),
-                          userId: widget.userId,
-                        );
-                        ChatViewModelProvider.createChat(newChat);
+                        // final newChat = ChatInfo(
+                        //   chatroomId: data!.docs.first.id,
+                        //   senderUser: data!.docs.first.data()['users'] ?? "",
+                        //   receiverUser: widget.userName,
+                        //   message: _controller.text,
+                        //   time: DateTime.now(),
+                        //   userId: widget.userId,
+                        // );
+                        // ChatViewModelProvider.createChat(newChat);
 
                         // ChatViewModelProvider.updateUsersIsOnline(
                         //     widget.user, widget.user.id, chatList);
 
-                        _controller.clear();
+                        // _controller.clear();
 
-                        // setState(() {
-                        //   fromLanguage = isMe ? language1 : language2;
-                        //   toLanguage = isMe ? language2 : language1;
-                        // });
-                        //
-                        // saveChatMessages();
+                        setState(() {
+                          fromLanguage = isMe ? language1 : language2;
+                          toLanguage = isMe ? language2 : language1;
+                        });
+
+                        saveChatMessages();
                       },
                       child: Icon(Icons.send),
                     ),
@@ -296,14 +295,14 @@ class _DmState extends State<Dm> {
     );
   }
 
-  // Widget buildTitle() => TitleWidget(
-  //       language1: language1,
-  //       language2: language2,
-  //       onChangedLanguage1: (newLanguage) => setState(() {
-  //         language1 = newLanguage!;
-  //       }),
-  //       onChangedLanguage2: (newLanguage) => setState(() {
-  //         language2 = newLanguage!;
-  //       }),
-  //     );
+  Widget buildTitle() => TitleWidget(
+        language1: language1,
+        language2: language2,
+        onChangedLanguage1: (newLanguage) => setState(() {
+          language1 = newLanguage!;
+        }),
+        onChangedLanguage2: (newLanguage) => setState(() {
+          language2 = newLanguage!;
+        }),
+      );
 }
