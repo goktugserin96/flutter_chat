@@ -37,11 +37,17 @@ class _DmMessagesState extends State<DmMessages> {
     });
   }
 
+  List<QueryDocumentSnapshot<Map<String, dynamic>>>? mix;
+
   @override
   Widget build(BuildContext context) {
     final seen = Set<String>();
 
-    var mix = dataChat!.docs
+    var mixList = mix;
+
+    if (mixList != null) {}
+
+    mix = dataChat!.docs
         .where((element) =>
             element.data()['chatroomId'] == data!.docs.first.id ||
                     element.data()['chatroomId'] == element.data()['senderId']
@@ -75,9 +81,9 @@ class _DmMessagesState extends State<DmMessages> {
                   child: Text('There is No Message'),
                 )
               : ListView.builder(
-                  itemCount: mix.length,
+                  itemCount: mix!.length,
                   itemBuilder: (context, index) {
-                    var chat = mix[index];
+                    var chat = mix![index];
 
                     var query1 =
                         chat.data()['chatroomId'] == data!.docs.first.id;

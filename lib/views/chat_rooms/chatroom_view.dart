@@ -206,8 +206,6 @@ class _ChatroomPageState extends State<ChatroomPage> {
       child: _visible && selected == index
           // && chatRooms.chatroomUsers.isNotEmpty
 
-          /// selected ==index hangi butondaysa o nu çalışrma işini yapar
-          /// _visible(false) ise butona tıklanmadan boş container döner. butonun içinde set state ile _visible =!_visible olduğu için butona tıklandığında true olur ve asıl alanı gösterir.
           ? Container(
               height: 200,
               child: userLengthInChatroom.isNotEmpty

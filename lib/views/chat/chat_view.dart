@@ -105,8 +105,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    // AppProvider appProvider = Provider.of<AppProvider>(context);
-
     return Scaffold(
         appBar: AppBar(
           bottom: PreferredSize(
@@ -122,42 +120,46 @@ class _ChatPageState extends State<ChatPage> {
           centerTitle: true,
           title: Text('${widget.chatRooms.name} Page'),
         ),
-        body: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              BackgroundContainer,
-              StreamBuilder<List<ChatInfo>>(
-                  stream: ChatViewModel.getChatList(widget.chatRooms.id),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      print('dfdfd${snapshot.data}');
-                      return Center(child: Text('${snapshot.error}'));
-                    } else if (!snapshot.hasData) {
-                      return Container();
-                    } else {
-                      List<ChatInfo>? chatList = snapshot.data;
+        body: Stack(
+          children: [
+            BackgroundContainer,
+            Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  StreamBuilder<List<ChatInfo>>(
+                      stream: ChatViewModel.getChatList(widget.chatRooms.id),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          print('dfdfd${snapshot.data}');
+                          return Center(child: Text('${snapshot.error}'));
+                        } else if (!snapshot.hasData) {
+                          return Container();
+                        } else {
+                          List<ChatInfo>? chatList = snapshot.data;
 
-                      return Expanded(
-                        child: Container(
-                          child: ListView.builder(
-                              itemCount: chatList!.length,
-                              itemBuilder: (context, index) {
-                                ChatInfo chat = chatList[index];
+                          return Expanded(
+                            child: Container(
+                              child: ListView.builder(
+                                  itemCount: chatList!.length,
+                                  itemBuilder: (context, index) {
+                                    ChatInfo chat = chatList[index];
 
-                                isMe = chat.userId == widget.meId &&
-                                    chat.chatroomId == widget.chatRooms.id;
+                                    isMe = chat.userId == widget.meId &&
+                                        chat.chatroomId == widget.chatRooms.id;
 
-                                return ChatMessages(
-                                  chat: chat,
-                                  isMe: isMe,
-                                );
-                              }),
-                        ),
-                      );
-                    }
-                  }),
-              buildTextField()
-            ]));
+                                    return ChatMessages(
+                                      chat: chat,
+                                      isMe: isMe,
+                                    );
+                                  }),
+                            ),
+                          );
+                        }
+                      }),
+                  buildTextField()
+                ]),
+          ],
+        ));
   }
 
   Widget buildTextField() {

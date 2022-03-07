@@ -6,6 +6,7 @@ import 'package:flutter_android_app/provider/app_provider.dart';
 import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
 
+import '../../data.dart';
 import '../../widgets/chat_messages_widget.dart';
 import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
@@ -41,35 +42,69 @@ class _DmState extends State<Dm> {
     super.initState();
   }
 
-  bool? isLoading;
+  // bool isMe = false;
+
+  bool isLoading = false;
   void getData() async {
-    setState(() {
-      isLoading = true;
+    await FirebaseFirestore.instance
+        .collection('chat')
+        .where('chatroomId', isEqualTo: widget.userId)
+        .where('userId', isEqualTo: data!.docs.first.id)
+        .get()
+        .then((value) {
+      setState(() {
+        chatData = value;
+        isLoading = false;
+      });
     });
-    {
-      try {
-        await FirebaseFirestore.instance
-            .collection('chat')
-            .where('chatroomId', isEqualTo: widget.userId)
-            .where('userId', isEqualTo: data!.docs.first.id)
-            .get()
-            .then((value) {
-          setState(() {
-            chatData = value;
-          });
-        });
-      } finally {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
   }
 
 //
   int charLength = 0;
 
   bool status = false;
+
+  // String language1 = Translations.languages.first;
+  // String language2 = Translations.languages.first;
+  //
+  // String fromLanguage = "";
+  //
+  // String toLanguage = "";
+  //
+  // var translatedMessage;
+  // var translator = GoogleTranslator();
+
+  // void saveChatMessages() {
+  //   AppProvider provider = Provider.of<AppProvider>(context, listen: false);
+  //
+  //   var message = _controller.text;
+  //   print('fromlanguage $fromLanguage');
+  //   print('toLanguage $toLanguage');
+  //   final fromLanguageCode = Translations.getLanguageCode(fromLanguage);
+  //   final toLanguageCode = Translations.getLanguageCode(toLanguage);
+  //
+  //   setState(() {
+  //     translator
+  //         .translate(_controller.text,
+  //             from: fromLanguageCode, to: toLanguageCode)
+  //         .then((value) {
+  //       setState(() {
+  //         translatedMessage = value.text;
+  //         provider.createChat(ChatInfo(
+  //           chatroomId: data!.docs.first.id,
+  //           senderUser: data!.docs.first.data()['users'] ?? "",
+  //           receiverUser: widget.userName,
+  //           message: _controller.text,
+  //           time: DateTime.now(),
+  //           userId: widget.userId,
+  //         ));
+  //       });
+  //     });
+  //   });
+  //
+  //   status = false;
+  //   _controller.clear();
+  // }
 
   _onChanged(String value) {
     setState(() {
@@ -105,16 +140,14 @@ class _DmState extends State<Dm> {
 
     return Scaffold(
         appBar: AppBar(
+          // bottom: PreferredSize(
+          //   preferredSize: Size.fromHeight(30),
+          //   child: buildTitle(),
+          // ),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
-              // await Provider.of<ChatroomViewModel>(context, listen: false)
-              //     .deleteUser(widget.user);
-
               Navigator.pop(context);
-//
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => MyHomePage()));
             },
           ),
           centerTitle: true,
@@ -123,11 +156,10 @@ class _DmState extends State<Dm> {
         body: Stack(
           children: [
             BackgroundContainer,
-            isLoading == true
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : StreamBuilder<List<ChatInfo>>(
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                StreamBuilder<List<ChatInfo>>(
                     stream: ChatViewModel.getPrivateChatList(
                         data!.docs.first.id,
                         widget.userId), //UserProvider[0].id
@@ -136,79 +168,43 @@ class _DmState extends State<Dm> {
                         print('dfdfd${snapshot.data}');
                         return Center(child: Text('${snapshot.error}'));
                       } else if (!snapshot.hasData) {
-                        return const Center(
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
+                        return Container();
                       } else {
                         List<ChatInfo>? chatList = snapshot.data;
 
                         Provider.of<AppProvider>(context).setChats(chatList!);
 
-                        return Container(
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  child: ListView.builder(
-                                      // shrinkWrap: true,
-                                      // physics: BouncingScrollPhysics(),
-                                      itemCount: chatList.length,
-                                      itemBuilder: (context, i) {
-                                        ChatInfo chat = chatList[i];
-                                        // Provider.of<AppProvider>(context)
-                                        //     .deneme(chat);
+                        return Expanded(
+                          child: Container(
+                            child: ListView.builder(
+                                itemCount: chatList.length,
+                                itemBuilder: (context, i) {
+                                  ChatInfo chat = chatList[i];
 
-                                        final isMe =
-                                            chat.userId == widget.userId &&
-                                                chat.chatroomId ==
-                                                    data!.docs.first.id;
+                                  final isMe = chat.userId == widget.userId &&
+                                      chat.chatroomId == data!.docs.first.id;
 
-                                        final deneme1 = chat.chatroomId ==
-                                            data!.docs.first.id;
+                                  final deneme1 =
+                                      chat.chatroomId == data!.docs.first.id;
 
-                                        final deneme2 =
-                                            chat.userId == widget.userId;
+                                  final deneme2 = chat.userId == widget.userId;
 
-                                        final deneme3 =
-                                            chat.chatroomId == widget.userId;
+                                  final deneme3 =
+                                      chat.chatroomId == widget.userId;
 
-                                        final deneme4 =
-                                            chat.userId == data!.docs.first.id;
+                                  final deneme4 =
+                                      chat.userId == data!.docs.first.id;
 //
-                                        return
-                                            // chatBuild(chat,isMe,deneme1,deneme2,deneme3,deneme4)
-                                            //
-                                            //
-                                            // (deneme1 && deneme2) ||
-                                            //       (deneme3 && deneme4)
-                                            //   ? DmChatWidget(isMe: isMe, chat: chat)
-                                            //   : Container();
-
-                                            buildChatArea(chat, isMe, deneme1,
-                                                deneme2, deneme3, deneme4);
-                                      }),
-                                ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color.fromARGB(255, 18, 32, 47),
-                                      // shadow direction: bottom right
-                                    )
-                                  ],
-                                ),
-                                child: buildTextField(appProvider, chatList),
-                              ),
-                            ],
+                                  return buildChatArea(chat, isMe, deneme1,
+                                      deneme2, deneme3, deneme4);
+                                }),
                           ),
                         );
                       }
                     }),
+                buildTextField(appProvider, chatList),
+              ],
+            ),
           ],
         ));
   }
@@ -268,10 +264,6 @@ class _DmState extends State<Dm> {
                       onPressed: () {
                         status = false;
 
-                        ///chat provider database için // chati burada atama yapıyoruz
-                        ///
-                        ///
-                        ///
                         final newChat = ChatInfo(
                           chatroomId: data!.docs.first.id,
                           senderUser: data!.docs.first.data()['users'] ?? "",
@@ -286,6 +278,13 @@ class _DmState extends State<Dm> {
                         //     widget.user, widget.user.id, chatList);
 
                         _controller.clear();
+
+                        // setState(() {
+                        //   fromLanguage = isMe ? language1 : language2;
+                        //   toLanguage = isMe ? language2 : language1;
+                        // });
+                        //
+                        // saveChatMessages();
                       },
                       child: Icon(Icons.send),
                     ),
@@ -296,4 +295,15 @@ class _DmState extends State<Dm> {
       ),
     );
   }
+
+  // Widget buildTitle() => TitleWidget(
+  //       language1: language1,
+  //       language2: language2,
+  //       onChangedLanguage1: (newLanguage) => setState(() {
+  //         language1 = newLanguage!;
+  //       }),
+  //       onChangedLanguage2: (newLanguage) => setState(() {
+  //         language2 = newLanguage!;
+  //       }),
+  //     );
 }
