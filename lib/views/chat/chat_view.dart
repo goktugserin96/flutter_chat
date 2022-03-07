@@ -203,10 +203,10 @@ class _ChatPageState extends State<ChatPage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
                       onPressed: () {
-                        setState(() {
-                          fromLanguage = isMe ? language1 : language2;
-                          toLanguage = isMe ? language2 : language1;
-                        });
+                        // setState(() {
+                        //   // fromLanguage = isMe ? language1 : language2;
+                        //   // toLanguage = isMe ? language2 : language1;
+                        // });
 
                         saveChatMessages();
                       },
