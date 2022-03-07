@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_android_app/models/chat.dart';
 import 'package:flutter_android_app/models/chat_rooms.dart';
 
@@ -13,6 +14,17 @@ import 'package:flutter_android_app/models/chat_rooms.dart';
 //   "ES": "Spanish"};
 
 // final imageUrl = "https://github.com/madebybowtie/FlagKit/blob/master/Assets/PNG/TR.png"
+
+const AssetImage assetImage = AssetImage("assets/images/background.png");
+
+Widget BackgroundContainer = Container(
+  decoration: BoxDecoration(
+    image: DecorationImage(
+      image: assetImage,
+      fit: BoxFit.cover,
+    ),
+  ),
+);
 
 List<ChatRooms> chatroomsList = [
   ChatRooms(

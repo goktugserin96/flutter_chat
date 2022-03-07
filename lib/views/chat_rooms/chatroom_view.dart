@@ -6,9 +6,9 @@ import 'package:flutter_android_app/models/users.dart';
 import 'package:flutter_android_app/views/chat/chat_view.dart';
 import 'package:flutter_android_app/views/chat/dm.dart';
 import 'package:flutter_android_app/views/chat_rooms/chatroom_view_model.dart';
-import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
 
+import '../../data.dart';
 import '../../provider/app_provider.dart';
 import '../../utils/translations.dart';
 import '../../widgets/title_widget.dart';
@@ -43,7 +43,7 @@ class _ChatroomPageState extends State<ChatroomPage> {
             IconButton(
               onPressed: () {
                 FirebaseAuth.instance.signOut();
-
+//
                 // userViewProvider.updateUsers(user, "", data!.docs.first.id);
               },
               icon: Icon(Icons.logout),

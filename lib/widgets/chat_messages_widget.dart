@@ -51,18 +51,18 @@ class ChatMessages extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
           ),
-          chat.receiverUser == chat.senderUser
-              ? Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                  child: chat.translatedMessage!.isEmpty
-                      ? SizedBox()
-                      : Text(
-                          '${chat.translatedMessage![0].toUpperCase() + chat.translatedMessage!.substring(1)}',
-                          style:
-                              TextStyle(color: Colors.white.withOpacity(0.6)),
-                        ),
-                )
-              : SizedBox(),
+          // chat.receiverUser == chat.senderUser
+          //     ?
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+            child: chat.translatedMessage!.isEmpty
+                ? SizedBox()
+                : Text(
+                    '${chat.translatedMessage![0].toUpperCase() + chat.translatedMessage!.substring(1)}',
+                    style: TextStyle(color: Colors.white.withOpacity(0.6)),
+                  ),
+          ),
+          // : SizedBox(),
           Text(
             '${chat.time.hour}:${chat.time.minute}',
           ),

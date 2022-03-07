@@ -12,18 +12,6 @@ class ChatDatabase {
     await _firestore.collection(referancePath).doc(id).delete();
   }
 
-//   }
-
-  /// FireStore' a yeni bilgi ekleme ve güncelleme hizmeti sağlamak
-  // Future<void> setChatData(
-  //     {required String collectionPath,
-  //     required Map<String, dynamic> chatAsMap}) async {
-  //   await _firestore
-  //       .collection(collectionPath)
-  //       .doc(ChatInfo.fromMap(chatAsMap).chatId)
-  //       .set(chatAsMap);
-  // }
-
   static Future addChatInitial(List<ChatInfo> chats) async {
     final refChat = FirebaseFirestore.instance.collection('chat');
 

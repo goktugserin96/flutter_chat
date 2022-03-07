@@ -5,11 +5,11 @@ import 'package:flutter_android_app/models/chat_rooms.dart';
 import 'package:provider/provider.dart';
 import 'package:translator/translator.dart';
 
+import '../../data.dart';
 import '../../provider/app_provider.dart';
 import '../../utils/translations.dart';
 import '../../widgets/chat_messages_widget.dart';
 import '../../widgets/title_widget.dart';
-import '../nickname/nickname_view.dart';
 import '../screens/screens_page_view.dart';
 import 'chat_view_model.dart';
 
@@ -134,6 +134,7 @@ class _ChatPageState extends State<ChatPage> {
                           print('dfdfd${snapshot.data}');
                           return Center(child: Text('${snapshot.error}'));
                         } else if (!snapshot.hasData) {
+                          print('asdas');
                           return Container();
                         } else {
                           List<ChatInfo>? chatList = snapshot.data;
@@ -147,6 +148,8 @@ class _ChatPageState extends State<ChatPage> {
 
                                     isMe = chat.userId == widget.meId &&
                                         chat.chatroomId == widget.chatRooms.id;
+
+                                    print('isMe  $isMe');
 
                                     return ChatMessages(
                                       chat: chat,
@@ -205,8 +208,8 @@ class _ChatPageState extends State<ChatPage> {
                               borderRadius: BorderRadius.circular(30))),
                       onPressed: () {
                         setState(() {
-                          fromLanguage = isMe ? language1 : language2;
-                          toLanguage = isMe ? language2 : language1;
+                          fromLanguage = language1;
+                          toLanguage = language2;
                         });
 
                         saveChatMessages();

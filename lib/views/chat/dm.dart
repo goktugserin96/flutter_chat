@@ -279,8 +279,8 @@ class _DmState extends State<Dm> {
                         // _controller.clear();
 
                         setState(() {
-                          fromLanguage = isMe ? language1 : language2;
-                          toLanguage = isMe ? language2 : language1;
+                          fromLanguage = language1;
+                          toLanguage = language2;
                         });
 
                         saveChatMessages();

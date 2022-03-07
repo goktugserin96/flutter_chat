@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/views/chat/dm.dart';
-import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 
+import '../../data.dart';
 import '../../models/chat.dart';
 import '../screens/screens_page_view.dart';
 
@@ -78,6 +78,12 @@ class _DmMessagesState extends State<DmMessages> {
                   itemCount: mix.length,
                   itemBuilder: (context, index) {
                     var chat = mix[index];
+
+                    // final isMe = chat. == widget.userId &&
+                    //     chat.chatroomId == data!.docs.first.id;
+
+                    print('deneme ${chat.data()['userId']}');
+                    print('deneme2 ${chat.data()['chatroomId']}');
 
                     var query1 =
                         chat.data()['chatroomId'] == data!.docs.first.id;
