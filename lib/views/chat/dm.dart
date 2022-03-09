@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_android_app/models/chat.dart';
 import 'package:flutter_android_app/provider/app_provider.dart';
-import 'package:flutter_android_app/views/nickname/nickname_view.dart';
 import 'package:provider/provider.dart';
 import 'package:translator/translator.dart';
 
@@ -137,6 +136,8 @@ class _DmState extends State<Dm> {
     ///users
     AppProvider appProvider = Provider.of<AppProvider>(context);
 
+    int pageIndex = 1;
+
     return Scaffold(
         appBar: AppBar(
           bottom: PreferredSize(
@@ -146,7 +147,12 @@ class _DmState extends State<Dm> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ScreensPage(
+                            pageIndex: pageIndex,
+                          )));
             },
           ),
           centerTitle: true,

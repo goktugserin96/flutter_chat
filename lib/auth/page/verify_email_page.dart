@@ -66,7 +66,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
     myData = FirebaseAuth.instance.currentUser!;
     return isEmailVerify
-        ? ScreensPage(mail: myData!.email!)
+        ? ScreensPage(pageIndex: 0)
         : Scaffold(
             appBar: AppBar(
               title: Text("Verify Email"),

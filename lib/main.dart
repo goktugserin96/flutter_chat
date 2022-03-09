@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => EmailSignInProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         scaffoldMessengerKey: Utils.scaffoldMessengerKey,
         navigatorKey: navigatorKey,
         theme: ThemeData.dark(),

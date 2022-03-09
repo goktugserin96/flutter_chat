@@ -15,9 +15,9 @@ String? errorPic =
 QuerySnapshot<Map<String, dynamic>>? data;
 
 class ScreensPage extends StatefulWidget {
-  ScreensPage({Key? key, required this.mail}) : super(key: key);
+  ScreensPage({Key? key, required this.pageIndex}) : super(key: key);
 
-  final String mail;
+  int pageIndex;
 
   @override
   State<ScreensPage> createState() => _ScreensPageState();
@@ -61,10 +61,10 @@ class _ScreensPageState extends State<ScreensPage> {
         unselectedItemColor: Colors.white.withOpacity(0.7), //saydamlaştırma
         selectedItemColor: Colors.white,
         backgroundColor: Theme.of(context).primaryColor,
-        currentIndex: selectedIndex,
+        currentIndex: widget.pageIndex,
         onTap: (index) {
           setState(() {
-            selectedIndex = index;
+            widget.pageIndex = index;
           });
         },
         items: [
@@ -94,7 +94,7 @@ class _ScreensPageState extends State<ScreensPage> {
             List<Users> userList = snapshot.data!;
 
             Provider.of<AppProvider>(context).setUsers(userList);
-            return tabs[selectedIndex];
+            return tabs[widget.pageIndex];
           }
         },
       ),

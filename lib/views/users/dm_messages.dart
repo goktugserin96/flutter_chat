@@ -23,7 +23,7 @@ class _DmMessagesState extends State<DmMessages> {
   }
 
   bool isLoading = true;
-  bool isSeen = false;
+
   void getData() async {
     await FirebaseFirestore.instance
         .collection("chat")
@@ -37,19 +37,23 @@ class _DmMessagesState extends State<DmMessages> {
     });
   }
 
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> mix = [];
   @override
   Widget build(BuildContext context) {
     final seen = Set<String>();
 
-    final mix = dataChat!.docs
-        .where((element) =>
-            element.data()['chatroomId'] == data!.docs.first.id ||
-                    element.data()['chatroomId'] == element.data()['senderId']
-                ? seen.add(element.data()['receiverUser'])
-                : element.data()['userId'] == data!.docs.first.id
-                    ? seen.add(element.data()['senderUser'])
-                    : false)
-        .toList();
+    if (isLoading == false) {
+      mix = dataChat!.docs
+          .where((element) => element.data()['chatroomId'] ==
+                  data!.docs.first
+                      .id //chatroomId eğer bana eşitse mesajı be göndermiş oluyorum mesajı gönderdiğim kişinin adını set<string> e ekledik
+
+              ? seen.add(element.data()['receiverUser'])
+              : element.data()['userId'] == data!.docs.first.id
+                  ? seen.add(element.data()['senderUser'])
+                  : false)
+          .toList();
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -70,31 +74,42 @@ class _DmMessagesState extends State<DmMessages> {
         ),
         body: Stack(children: [
           BackgroundContainer,
-          dataChat!.docs.isEmpty
+          isLoading
               ? Center(
-                  child: Text('There is No Message'),
+                  child: CircularProgressIndicator(),
                 )
-              : ListView.builder(
-                  itemCount: mix.length,
-                  itemBuilder: (context, index) {
-                    var chat = mix[index];
+              : dataChat!.docs.isEmpty
+                  ? Center(
+                      child: Text('There is no any message'),
+                    )
+                  : ListView.builder(
+                      itemCount: mix.length,
+                      itemBuilder: (context, index) {
+                        var chat = mix[index];
 
-                    // final isMe = chat. == widget.userId &&
-                    //     chat.chatroomId == data!.docs.first.id;
+                        // final isMe = chat. == widget.userId &&
+                        //     chat.chatroomId == data!.docs.first.id;
 
-                    print('deneme ${chat.data()['userId']}');
-                    print('deneme2 ${chat.data()['chatroomId']}');
+                        /// userId ==data!.docs.first.id =>gelen mesaj
+                        ///chatroomId ==data!.docs.first.id => giden mesaj
+                        ///
+                        /// Query1 giden mesaj
+                        /// Query2 gelen mesaj
 
-                    var query1 =
-                        chat.data()['chatroomId'] == data!.docs.first.id;
-                    var query2 = chat.data()['userId'] == data!.docs.first.id;
-                    var isChatroom = chat.data()['senderUser'] !=
-                        chat.data()['receiverUser'];
+                        print('deneme ${chat.data()['userId']}');
+                        print('deneme2 ${chat.data()['chatroomId']}');
 
-                    return messageList(
-                        context, chat, query1, query2, isChatroom);
-                  },
-                )
+                        var query1 =
+                            chat.data()['chatroomId'] == data!.docs.first.id;
+                        var query2 =
+                            chat.data()['userId'] == data!.docs.first.id;
+                        var isChatroom = chat.data()['senderUser'] !=
+                            chat.data()['receiverUser'];
+
+                        return messageList(
+                            context, chat, query1, query2, isChatroom);
+                      },
+                    )
         ]));
   }
 
@@ -108,9 +123,6 @@ class _DmMessagesState extends State<DmMessages> {
       padding: const EdgeInsets.all(1.0),
       child: GestureDetector(
         onTap: () {
-          setState(() {
-            isSeen = true;
-          });
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -132,8 +144,8 @@ class _DmMessagesState extends State<DmMessages> {
                     trailing: query2
                         ? CircleAvatar(
                             child: Text(
-                              "${chat.data().length}",
-                              style: TextStyle(color: Colors.black),
+                              "1",
+                              style: TextStyle(color: Colors.white),
                             ),
                             backgroundColor: Colors.green,
                             radius: 10,
